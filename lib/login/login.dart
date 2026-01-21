@@ -5,7 +5,18 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Apodel Restorant'),
+        backgroundColor: Colors.amber,
+        automaticallyImplyLeading: false, // prevents back icon
+        scrolledUnderElevation:
+            0, // scrolledUnderElevation: 0 = no shadow when scrolled appBar
+        elevation: 0, // no shadow in static appBar
+      ),
+      resizeToAvoidBottomInset:
+          true, // prevents the keyboard from overlapping the UI
+      body: Text('Test'),
+    );
   }
 }
