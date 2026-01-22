@@ -1,6 +1,9 @@
+import 'package:apodel_restorant/core/theme/theme.dart';
+import 'package:apodel_restorant/core/theme/theme_provider.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
@@ -9,7 +12,12 @@ void main() async {
   tz.initializeTimeZones();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  runApp(const ApodelRestorant());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider()..loadThemeMode(),
+      child: const ApodelRestorant(),
+    ),
+  );
 }
 
 class ApodelRestorant extends StatelessWidget {
@@ -17,6 +25,17 @@ class ApodelRestorant extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: LoginScreen());
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return MaterialApp(
+      home: LoginScreen(),
+      theme: themeProvider.themeData,
+      darkTheme: darkMode,
+      themeMode: themeProvider.themeMode == ThemeModeOption.on
+          ? ThemeMode.dark
+          : themeProvider.themeMode == ThemeModeOption.off
+          ? ThemeMode.light
+          : ThemeMode.system,
+    );
   }
 }
