@@ -17,6 +17,6 @@ class ApodelRestorant extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: const LoginScreen());
+    return MaterialApp(home: LoginScreen());
   }
 }
