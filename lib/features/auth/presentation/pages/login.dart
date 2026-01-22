@@ -48,7 +48,7 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 32),
               _signin(context),
               const SizedBox(height: 20),
-              _divider("Or continue with", context),
+              _divider("ose hyr me", context),
               const SizedBox(height: 20),
               SizedBox(
                 width: MediaQuery.of(context).size.width - 50,
@@ -88,7 +88,7 @@ class LoginScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Email Address',
+          'Email Adresa',
           style: GoogleFonts.nunito(
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimary,
@@ -105,7 +105,7 @@ class LoginScreen extends StatelessWidget {
             controller: _emailController,
             decoration: InputDecoration(
               filled: true,
-              hintText: 'str8ch@hotmail.com',
+              hintText: 'apodel@hotmail.com',
               hintStyle: GoogleFonts.nunito(
                 color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.normal,
@@ -143,7 +143,7 @@ class LoginScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Password',
+          'Fjalëkalimi',
           style: GoogleFonts.nunito(
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimary,
@@ -228,7 +228,7 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
         child: Text(
-          'Sign In',
+          'Kyçu',
           style: GoogleFonts.nunito(
             fontSize: 18,
             color: Theme.of(context).colorScheme.onPrimary,
@@ -323,7 +323,7 @@ class LoginScreen extends StatelessWidget {
         text: TextSpan(
           children: [
             TextSpan(
-              text: "New to Str8ch? ",
+              text: "Restorant i ri? ",
               style: GoogleFonts.nunito(
                 color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.normal,
@@ -331,7 +331,7 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             TextSpan(
-              text: "Sign Up Now",
+              text: "Regjistrohu tani",
               style: GoogleFonts.nunito(
                 color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.normal,
