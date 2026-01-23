@@ -1,7 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:apodel_restorant/core/theme/theme.dart';
 import 'package:apodel_restorant/core/theme/theme_provider.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/login.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;

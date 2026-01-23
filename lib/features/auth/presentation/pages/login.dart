@@ -1,11 +1,11 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:apodel_restorant/features/auth/presentation/pages/signup.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:stretchandmobility/services/auth.dart';
-// import 'package:stretchandmobility/signup/signup.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -341,7 +341,7 @@ class LoginScreen extends StatelessWidget {
                 ..onTap = () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    MaterialPageRoute(builder: (context) => SignupScreen()),
                   );
                 },
             ),

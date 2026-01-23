@@ -1,11 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/login.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
-
 // import 'package:stretchandmobility/services/auth.dart';
 
 class SignupScreen extends StatelessWidget {
