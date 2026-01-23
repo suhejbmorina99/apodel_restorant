@@ -29,7 +29,7 @@ class SignupScreen extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Join Str8ch Today!',
+                    'Krijo llogarinë tënde dhe prano porositë!',
                     style: GoogleFonts.nunito(
                       textStyle: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
@@ -59,7 +59,7 @@ class SignupScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Email Address',
+          'Email Adresa',
           style: GoogleFonts.nunito(
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimary,
@@ -76,7 +76,7 @@ class SignupScreen extends StatelessWidget {
             controller: _emailController,
             decoration: InputDecoration(
               filled: true,
-              hintText: 'str8ch@hotmail.com',
+              hintText: 'apodel@hotmail.com',
               hintStyle: GoogleFonts.nunito(
                 color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.normal,
@@ -114,7 +114,7 @@ class SignupScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Password',
+          'Fjalëkalimi',
           style: GoogleFonts.nunito(
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimary,
@@ -179,7 +179,7 @@ class SignupScreen extends StatelessWidget {
           // Basic email format validation
           if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
             Fluttertoast.showToast(
-              msg: "Please enter a valid email address.",
+              msg: "Ju lutem vendosni një email të vlefshëm.",
               backgroundColor: Colors.black54,
               textColor: Colors.white,
             );
@@ -189,7 +189,7 @@ class SignupScreen extends StatelessWidget {
           // Password length validation
           if (password.length < 6) {
             Fluttertoast.showToast(
-              msg: "Password must be at least 6 characters long.",
+              msg: "Fjalëkalimi duhet të jetë minimumi 6 karaktere.",
               backgroundColor: Colors.black54,
               textColor: Colors.white,
             );
@@ -222,7 +222,7 @@ class SignupScreen extends StatelessWidget {
           ),
         ),
         child: Text(
-          'Sign Up',
+          'Regjistrohu',
           style: GoogleFonts.nunito(
             fontSize: 18,
             color: Theme.of(context).colorScheme.onPrimary,
@@ -240,7 +240,7 @@ class SignupScreen extends StatelessWidget {
         text: TextSpan(
           children: [
             TextSpan(
-              text: "Already Have Account? ",
+              text: "Ke një llogari? ",
               style: GoogleFonts.nunito(
                 color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.normal,
@@ -248,7 +248,7 @@ class SignupScreen extends StatelessWidget {
               ),
             ),
             TextSpan(
-              text: "Log In",
+              text: "Kyçu",
               style: GoogleFonts.nunito(
                 color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.normal,
