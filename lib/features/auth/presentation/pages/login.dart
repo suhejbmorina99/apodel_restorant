@@ -339,9 +339,10 @@ class LoginScreen extends StatelessWidget {
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  Navigator.push(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => SignupScreen()),
+                    (route) => false,
                   );
                 },
             ),
