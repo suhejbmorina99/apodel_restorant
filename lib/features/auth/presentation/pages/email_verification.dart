@@ -1,11 +1,10 @@
-import 'package:apodel_restorant/features/splash/presentation/pages/splash_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:stretchandmobility/screens/splash_screen.dart';
+import 'package:apodel_restorant/features/splash/presentation/pages/splash_page.dart';
 import 'package:apodel_restorant/features/auth/data/firebase_auth.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/signup.dart';
 
