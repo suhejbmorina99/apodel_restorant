@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:apodel_restorant/features/splash/presentation/pages/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,8 +11,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/email_verification.dart';
-import 'package:stretchandmobility/screens/splash_screen.dart';
-// import 'package:stretchandmobility/services/mail_service.dart';
+
+import 'package:apodel_restorant/core/network/email_service.dart';
 
 class AuthService {
   User? getCurrentUser() {
@@ -27,6 +28,8 @@ class AuthService {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
 
+      final EmailService emailService = EmailService();
+
       // final purchaserInfo = await Purchases.getCustomerInfo();
       // final newUserId = userCredential.user!.uid;
 
@@ -36,7 +39,11 @@ class AuthService {
 
       if (email.isNotEmpty) {
         try {
-          await sendWelcomeEmail(email, 'Str8cher');
+          await emailService.sendWelcomeEmail(
+            recipientEmail: email,
+            recipientName: 'Str8cher',
+          );
+          print('✅ Welcome email sent to $email');
         } catch (e) {
           print('❗ Failed to send welcome email: $e');
         }
@@ -172,7 +179,7 @@ class AuthService {
   Future<void> signout({required BuildContext context}) async {
     await FirebaseAuth.instance.signOut();
     await Future.delayed(const Duration(seconds: 1));
-    await Purchases.logOut();
+    // await Purchases.logOut();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (BuildContext context) => LoginScreen()),
@@ -202,6 +209,7 @@ class AuthService {
 
   Future<UserCredential?> signInWithApple(BuildContext context) async {
     try {
+      final EmailService emailService = EmailService();
       // Check if platform is iOS or macOS, where Apple Sign-In is supported
       if (Platform.isIOS || Platform.isMacOS) {
         final appleCredential = await SignInWithApple.getAppleIDCredential(
@@ -232,9 +240,13 @@ class AuthService {
 
         // Send welcome email if the user is new
         if (userCredential.additionalUserInfo?.isNewUser == true) {
-          final email = userCredential.user?.email ?? appleCredential.email;
+          final email = userCredential.user?.email;
+
           if (email != null && email.isNotEmpty) {
-            await sendWelcomeEmail(email, 'Str8cher');
+            await emailService.sendWelcomeEmail(
+              recipientEmail: email,
+              recipientName: 'Str8cher',
+            );
           }
         }
 
@@ -278,6 +290,7 @@ class AuthService {
 
   Future<UserCredential?> signInWithGoogle(BuildContext context) async {
     try {
+      final EmailService emailService = EmailService();
       final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
 
       // Exit if sign-in is cancelled
@@ -297,18 +310,27 @@ class AuthService {
       );
 
       // RevenueCat: ensure logged in with correct Firebase UID
-      final purchaserInfo = await Purchases.getCustomerInfo();
-      final currentUserId = userCredential.user!.uid;
+      // final purchaserInfo = await Purchases.getCustomerInfo();
+      // final currentUserId = userCredential.user!.uid;
 
-      if (purchaserInfo.originalAppUserId != currentUserId) {
-        await Purchases.logIn(currentUserId);
-      }
+      // if (purchaserInfo.originalAppUserId != currentUserId) {
+      //   await Purchases.logIn(currentUserId);
+      // }
 
       // Send welcome email if the user is new
       if (userCredential.additionalUserInfo?.isNewUser == true) {
         final email = userCredential.user?.email;
+
         if (email != null && email.isNotEmpty) {
-          await sendWelcomeEmail(email, 'Str8cher');
+          emailService
+              .sendWelcomeEmail(
+                recipientEmail: email,
+                recipientName: 'Str8cher',
+              )
+              .catchError((e) {
+                // log only, never block signup
+                print('Welcome email failed: $e');
+              });
         }
       }
 
