@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "472813293545",
+    "project_id": "apodel-restorant",
+    "storage_bucket": "apodel-restorant.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472813293545:android:b931c78fd619a57372c578",
+        "android_client_info": {
+          "package_name": "com.example.apodel_restorant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "472813293545-bvomu82pg1qftk7fnqh6h81cqr8djd4o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWWNMSmgcx0lwhhfK1Nz7y5ElI1gheFX0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "472813293545-bvomu82pg1qftk7fnqh6h81cqr8djd4o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "472813293545-4k0002i2m5pvhnt9qerpl5n8vdt1e354.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "app.apodel.restorant"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

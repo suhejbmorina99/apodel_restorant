@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:stretchandmobility/services/auth.dart';
+import 'package:apodel_restorant/features/auth/data/firebase_auth.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -202,22 +202,22 @@ class LoginScreen extends StatelessWidget {
           HapticFeedback.lightImpact();
           FocusScope.of(context).unfocus();
 
-          // bool success = await AuthService().signin(
-          //   email: _emailController.text,
-          //   password: _passwordController.text,
-          //   context: context,
-          // );
+          bool success = await AuthService().signin(
+            email: _emailController.text,
+            password: _passwordController.text,
+            context: context,
+          );
 
-          // if (success) {
-          //   // Set the last login timestamp
-          //   final SharedPreferences preferences =
-          //       await SharedPreferences.getInstance();
-          //   await preferences.setInt(
-          //     'lastLoginTimestamp',
-          //     DateTime.now().millisecondsSinceEpoch,
-          //   );
-          //   await preferences.setBool('isGuest', false);
-          // }
+          if (success) {
+            // Set the last login timestamp
+            final SharedPreferences preferences =
+                await SharedPreferences.getInstance();
+            await preferences.setInt(
+              'lastLoginTimestamp',
+              DateTime.now().millisecondsSinceEpoch,
+            );
+            await preferences.setBool('isGuest', false);
+          }
         },
         style: ElevatedButton.styleFrom(
           foregroundColor: const Color.fromARGB(255, 33, 33, 33),
@@ -242,7 +242,7 @@ class LoginScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         HapticFeedback.lightImpact();
-        // await AuthService().signInWithApple(context);
+        await AuthService().signInWithApple(context);
 
         final SharedPreferences preferences =
             await SharedPreferences.getInstance();
@@ -282,7 +282,7 @@ class LoginScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         HapticFeedback.lightImpact();
-        // await AuthService().signInWithGoogle(context);
+        await AuthService().signInWithGoogle(context);
 
         final SharedPreferences preferences =
             await SharedPreferences.getInstance();
