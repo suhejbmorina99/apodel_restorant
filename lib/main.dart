@@ -1,3 +1,4 @@
+import 'package:apodel_restorant/features/splash/presentation/pages/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:apodel_restorant/core/theme/theme.dart';
 import 'package:apodel_restorant/core/theme/theme_provider.dart';
@@ -28,7 +29,7 @@ class ApodelRestorant extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
-      home: LoginScreen(),
+      home: SplashScreen(),
       theme: themeProvider.themeData,
       darkTheme: darkMode,
       themeMode: themeProvider.themeMode == ThemeModeOption.on
