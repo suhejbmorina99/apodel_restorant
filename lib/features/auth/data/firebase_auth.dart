@@ -9,9 +9,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 // import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:stretchandmobility/screens/email_verification_screen.dart';
+import 'package:apodel_restorant/features/auth/presentation/pages/email_verification.dart';
 import 'package:stretchandmobility/screens/splash_screen.dart';
-import 'package:stretchandmobility/services/mail_service.dart';
+// import 'package:stretchandmobility/services/mail_service.dart';
 
 class AuthService {
   User? getCurrentUser() {
@@ -223,12 +223,12 @@ class AuthService {
         );
 
         // RevenueCat: check and log in if needed
-        final purchaserInfo = await Purchases.getCustomerInfo();
-        final currentUserId = userCredential.user!.uid;
+        // final purchaserInfo = await Purchases.getCustomerInfo();
+        // final currentUserId = userCredential.user!.uid;
 
-        if (purchaserInfo.originalAppUserId != currentUserId) {
-          await Purchases.logIn(currentUserId);
-        }
+        // if (purchaserInfo.originalAppUserId != currentUserId) {
+        //   await Purchases.logIn(currentUserId);
+        // }
 
         // Send welcome email if the user is new
         if (userCredential.additionalUserInfo?.isNewUser == true) {
