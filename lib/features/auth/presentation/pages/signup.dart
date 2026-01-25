@@ -4,8 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:stretchandmobility/services/auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:apodel_restorant/features/auth/data/firebase_auth.dart';
 
 class SignupScreen extends StatelessWidget {
   SignupScreen({super.key});
@@ -196,22 +196,22 @@ class SignupScreen extends StatelessWidget {
             return;
           }
 
-          // bool success = await AuthService().signup(
-          //   email: email,
-          //   password: password,
-          //   context: context,
-          // );
+          bool success = await AuthService().signup(
+            email: email,
+            password: password,
+            context: context,
+          );
 
-          // if (success) {
-          //   final SharedPreferences preferences =
-          //       await SharedPreferences.getInstance();
-          //   await preferences.setInt(
-          //     'lastLoginTimestamp',
-          //     DateTime.now().millisecondsSinceEpoch,
-          //   );
+          if (success) {
+            final SharedPreferences preferences =
+                await SharedPreferences.getInstance();
+            await preferences.setInt(
+              'lastLoginTimestamp',
+              DateTime.now().millisecondsSinceEpoch,
+            );
 
-          //   await preferences.setBool('isGuest', false);
-          // }
+            await preferences.setBool('isGuest', false);
+          }
         },
         style: ElevatedButton.styleFrom(
           foregroundColor: const Color.fromARGB(255, 33, 33, 33),

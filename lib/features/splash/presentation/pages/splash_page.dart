@@ -35,12 +35,10 @@ class _SplashScreen extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _animation;
   late Animation<Offset> _slideAnimation;
-  bool _isGuestUser = true;
 
   @override
   void initState() {
     super.initState();
-    _checkIfGuestUser();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     _controller =
@@ -53,8 +51,6 @@ class _SplashScreen extends State<SplashScreen>
                   await SharedPreferences.getInstance();
               // await preferences.setBool('isSubscribed', isSubscribed);
 
-              // final bool questionsCompleted =
-              //     preferences.getBool('questionsCompleted') ?? false;
               final bool isEmailVerified =
                   preferences.getBool('isEmailVerified') ?? false;
               final int? lastLoginTimestamp = preferences.getInt(
@@ -75,24 +71,7 @@ class _SplashScreen extends State<SplashScreen>
                       ),
                     );
                   }
-                } else if (isEmailVerified &&
-                    now.difference(lastLogin).inDays < 7) {
-                  if (mounted) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => const JustTestScreen(),
-                      ),
-                    );
-                  }
-                } else if (!isEmailVerified && _isGuestUser) {
-                  if (mounted) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => const JustTestScreen(),
-                      ),
-                    );
-                  }
-                } else if (!isEmailVerified && !_isGuestUser) {
+                } else if (!isEmailVerified) {
                   if (mounted) {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
@@ -108,41 +87,16 @@ class _SplashScreen extends State<SplashScreen>
                   }
                 }
               } else {
-                // if (questionsCompleted) {
-                //   if (mounted) {
-                //     Navigator.of(context).pushReplacement(
-                //       MaterialPageRoute(
-                //         builder: (context) => Login(),
-                //       ),
-                //     );
-                //   }
-                // } else {
                 if (mounted) {
                   Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          LoginScreen(), // const FirstQuestion();
-                    ),
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
                   );
                 }
-                // }
               }
             }
           });
 
     _controller.forward();
-  }
-
-  Future<void> _checkIfGuestUser() async {
-    final bool isGuest = await isGuestUser();
-    setState(() {
-      _isGuestUser = isGuest;
-    });
-  }
-
-  Future<bool> isGuestUser() async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    return preferences.getBool('isGuest') ?? true;
   }
 
   @override
