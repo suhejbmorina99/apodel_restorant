@@ -42,49 +42,44 @@ class _SplashScreen extends State<SplashScreen>
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     _controller =
-        AnimationController(duration: const Duration(seconds: 5), vsync: this)
-          ..addStatusListener((status) async {
-            if (status == AnimationStatus.completed) {
-              // final bool isSubscribed = await isUserSubscribed();
+        AnimationController(
+          duration: const Duration(seconds: 5),
+          vsync: this,
+        )..addStatusListener((status) async {
+          if (status == AnimationStatus.completed) {
+            // final bool isSubscribed = await isUserSubscribed();
 
-              final SharedPreferences preferences =
-                  await SharedPreferences.getInstance();
-              // await preferences.setBool('isSubscribed', isSubscribed);
+            final SharedPreferences preferences =
+                await SharedPreferences.getInstance();
+            // await preferences.setBool('isSubscribed', isSubscribed);
 
-              final bool isEmailVerified =
-                  preferences.getBool('isEmailVerified') ?? false;
-              final int? lastLoginTimestamp = preferences.getInt(
-                'lastLoginTimestamp',
+            final bool isEmailVerified =
+                preferences.getBool('isEmailVerified') ?? false;
+            final int? lastLoginTimestamp = preferences.getInt(
+              'lastLoginTimestamp',
+            );
+
+            if (lastLoginTimestamp != null) {
+              final DateTime lastLogin = DateTime.fromMillisecondsSinceEpoch(
+                lastLoginTimestamp,
               );
+              final DateTime now = DateTime.now();
 
-              if (lastLoginTimestamp != null) {
-                final DateTime lastLogin = DateTime.fromMillisecondsSinceEpoch(
-                  lastLoginTimestamp,
-                );
-                final DateTime now = DateTime.now();
-
-                if (isEmailVerified && now.difference(lastLogin).inDays < 7) {
-                  if (mounted) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => const JustTestScreen(),
-                      ),
-                    );
-                  }
-                } else if (!isEmailVerified) {
-                  if (mounted) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => const EmailVerificationScreen(),
-                      ),
-                    );
-                  }
-                } else {
-                  if (mounted) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
-                  }
+              if (isEmailVerified && now.difference(lastLogin).inMinutes < 1) {
+                if (mounted) {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const JustTestScreen(),
+                    ),
+                  );
+                }
+              } else if (!isEmailVerified) {
+                if (mounted) {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const EmailVerificationScreen(),
+                    ),
+                  );
                 }
               } else {
                 if (mounted) {
@@ -93,8 +88,15 @@ class _SplashScreen extends State<SplashScreen>
                   );
                 }
               }
+            } else {
+              if (mounted) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              }
             }
-          });
+          }
+        });
 
     _controller.forward();
   }
