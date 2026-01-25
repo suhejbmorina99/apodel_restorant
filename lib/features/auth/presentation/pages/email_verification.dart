@@ -37,7 +37,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     } else {
       await _setEmailVerificationStatus(false);
       Fluttertoast.showToast(
-        msg: "Please verify your email before continuing.",
+        msg: "Verifiko email-in përpara se të vazhdosh.",
         backgroundColor: Colors.black54,
         textColor: Colors.white,
       );
@@ -61,7 +61,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    'Email Verification!',
+                    'Verifiko Email Adresen!',
                     style: GoogleFonts.nunito(
                       textStyle: TextStyle(
                         color: Theme.of(context).colorScheme.onPrimary,
@@ -77,7 +77,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'A verification link has been sent to your email.',
+                      'Kemi dërguar një link verifikimi \n në adresën tuaj të email-it.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.nunito(fontSize: 18),
                     ),
@@ -107,7 +107,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             ),
                           ),
                           child: Text(
-                            'I have verified my email',
+                            'Kam verifikuar email adresën time',
                             style: GoogleFonts.nunito(
                               fontSize: 18,
                               color: Theme.of(context).colorScheme.onPrimary,
@@ -148,7 +148,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             ),
                           ),
                           child: Text(
-                            'Wrong Email?',
+                            'Email i gabuar? Ndrysho',
                             style: GoogleFonts.nunito(fontSize: 18),
                           ),
                         ),

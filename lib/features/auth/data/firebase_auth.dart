@@ -40,7 +40,7 @@ class AuthService {
         try {
           await emailService.sendWelcomeEmail(
             recipientEmail: email,
-            recipientName: 'Str8cher',
+            recipientName: 'Apodel',
           );
           print('✅ Welcome email sent to $email');
         } catch (e) {
@@ -244,7 +244,7 @@ class AuthService {
           if (email != null && email.isNotEmpty) {
             await emailService.sendWelcomeEmail(
               recipientEmail: email,
-              recipientName: 'Str8cher',
+              recipientName: 'Apodel',
             );
           }
         }
@@ -322,10 +322,7 @@ class AuthService {
 
         if (email != null && email.isNotEmpty) {
           emailService
-              .sendWelcomeEmail(
-                recipientEmail: email,
-                recipientName: 'Str8cher',
-              )
+              .sendWelcomeEmail(recipientEmail: email, recipientName: 'Apodel')
               .catchError((e) {
                 // log only, never block signup
                 print('Welcome email failed: $e');

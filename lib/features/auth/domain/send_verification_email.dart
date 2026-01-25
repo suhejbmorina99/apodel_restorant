@@ -8,11 +8,11 @@ class WelcomeEmail {
 
   Map<String, dynamic> toBrevoPayload() {
     return {
-      "sender": {"name": "Str8ch", "email": "str8ch@hotmail.com"},
+      "sender": {"name": "Apodel", "email": "apodel@gmail.com"},
       "to": [
         {"email": recipientEmail},
       ],
-      "subject": "Welcome to Str8ch App!",
+      "subject": "Mirë se vini në Apodel!",
       "htmlContent": _htmlContent(),
     };
   }
@@ -21,18 +21,17 @@ class WelcomeEmail {
 
   String _htmlContent() {
     return '''
-      <p>Hi <strong>$recipientName</strong>, welcome to our app!</p>
-      <br>
-      <p>My name is Suhejb, and I'm the developer of Str8ch 👋.</p>
-      <br>
-      <p>Just wanted to let you know that we have a feedback board in the app!
-      If you signed up using your email, you can create and vote on new features
-      by navigating to <strong>Preferences → Give an Idea</strong>.</p>
-      <br>
-      <p>If you have any questions or feedback, feel free to reply directly
-      to this email. I'd love to hear from you!</p>
-      <br>
-      <p>Best regards,<br>Suhejb</p>
-    ''';
+    <p>Përshëndetje <strong>$recipientName</strong>, mirë se vini në aplikacionin tonë!</p>
+    <br>
+    <p>Ne jemi shumë të lumtur që ju kemi në <strong>Apodel</strong>.</p>
+    <br>
+    <p>Kemi krijuar këtë aplikacion për ta bërë përvojën tuaj sa më të këndshme.</p>
+    <br>
+    <p>Nëse keni ndonjë pyetje, sugjerim apo kërkesë të veçantë,
+    mos hezitoni të na kontaktoni drejtpërdrejt.
+    Do të jemi të kënaqur t'ju shërbejmë!</p>
+    <br>
+    <p>Me respekt,<br>Ekipi i Apodel</p>
+  ''';
   }
 }
