@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/login.dart';
-
+import 'package:apodel_restorant/features/registration/presentation/pages/basic_information.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/email_verification.dart';
 // import 'package:stretchandmobility/screens/paywall_screen.dart';
-import 'package:apodel_restorant/features/menu/test.dart';
+
 // import 'package:purchases_flutter/purchases_flutter.dart';
 
 // Future<bool> isUserSubscribed() async {
@@ -70,7 +70,7 @@ class _SplashScreen extends State<SplashScreen>
                 if (mounted) {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => const JustTestScreen(),
+                      builder: (context) => const BasicInformation(),
                     ),
                   );
                 }
