@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:apodel_restorant/core/theme/theme.dart';
 import 'package:apodel_restorant/core/theme/theme_provider.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:apodel_restorant/features/splash/presentation/pages/splash_page.dart';
@@ -11,8 +12,12 @@ import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+  );
   tz.initializeTimeZones();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 

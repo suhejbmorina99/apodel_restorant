@@ -47,6 +47,7 @@ dependencies:
   http: ^1.6.0
   firebase_core: ^4.4.0
   lottie: ^3.3.2
+  supabase_flutter: ^2.12.0
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +78,9 @@ flutter:
 
     # Animations
     - assets/animations/splash.json
+
+    # Env
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
