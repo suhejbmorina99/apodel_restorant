@@ -18,19 +18,20 @@ class _BasicInformationState extends State<BasicInformation> {
   final _emriBiznesitController = TextEditingController();
   final _numriIdentifikuesController = TextEditingController();
   final _numriMobilController = TextEditingController();
-  final _countryController = TextEditingController();
+  String? _selectedCountry;
   final _cityController = TextEditingController();
   final _postalCodeController = TextEditingController();
   final _adresaController = TextEditingController();
 
   bool _isLoading = false;
 
+  final List<String> _countries = ['Kosovë', 'Shqipëri'];
+
   @override
   void dispose() {
     _emriBiznesitController.dispose();
     _numriIdentifikuesController.dispose();
     _numriMobilController.dispose();
-    _countryController.dispose();
     _cityController.dispose();
     _postalCodeController.dispose();
     _adresaController.dispose();
@@ -51,7 +52,7 @@ class _BasicInformationState extends State<BasicInformation> {
         'emri_biznesit': _emriBiznesitController.text.trim(),
         'numri_identifikues': _numriIdentifikuesController.text.trim(),
         'numri_mobil': _numriMobilController.text.trim(),
-        'country': _countryController.text.trim(),
+        'country': _selectedCountry,
         'city': _cityController.text.trim(),
         'postal_code': _postalCodeController.text.trim(),
         'adresa': _adresaController.text.trim(),
@@ -73,7 +74,9 @@ class _BasicInformationState extends State<BasicInformation> {
         _emriBiznesitController.clear();
         _numriIdentifikuesController.clear();
         _numriMobilController.clear();
-        _countryController.clear();
+        setState(() {
+          _selectedCountry = null;
+        });
         _cityController.clear();
         _postalCodeController.clear();
         _adresaController.clear();
@@ -176,6 +179,94 @@ class _BasicInformationState extends State<BasicInformation> {
     );
   }
 
+  Widget _buildDropdown({
+    required BuildContext context,
+    required String label,
+    required String hint,
+    required String? value,
+    required List<String> items,
+    required void Function(String?) onChanged,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.nunito(
+            textStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 50,
+          child: DropdownButtonFormField<String>(
+            value: value,
+            decoration: InputDecoration(
+              filled: true,
+              hintText: hint,
+              hintStyle: GoogleFonts.nunito(
+                color: Theme.of(context).colorScheme.secondary,
+                fontWeight: FontWeight.normal,
+                fontSize: 14,
+              ),
+              fillColor: Theme.of(context).colorScheme.primaryContainer,
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  width: 2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(
+                  color: Color.fromARGB(255, 253, 199, 69),
+                  width: 2,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Colors.red, width: 2),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Colors.red, width: 2),
+              ),
+            ),
+            style: GoogleFonts.nunito(
+              color: Theme.of(context).colorScheme.onPrimary,
+              fontSize: 14,
+            ),
+            dropdownColor: Theme.of(context).colorScheme.primaryContainer,
+            items: items.map((String country) {
+              return DropdownMenuItem<String>(
+                value: country,
+                child: Text(
+                  country,
+                  style: GoogleFonts.nunito(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
+            validator: validator,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -249,14 +340,20 @@ class _BasicInformationState extends State<BasicInformation> {
                   ),
                   const SizedBox(height: 12),
 
-                  _buildTextField(
+                  _buildDropdown(
                     context: context,
                     label: 'Shteti',
-                    hint: 'Shqipëri, Kosovë, etj.',
-                    controller: _countryController,
+                    hint: 'Zgjidhni shtetin',
+                    value: _selectedCountry,
+                    items: _countries,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedCountry = newValue;
+                      });
+                    },
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Ju lutem shkruani shtetin';
+                      if (value == null || value.isEmpty) {
+                        return 'Ju lutem zgjidhni shtetin';
                       }
                       return null;
                     },
@@ -280,7 +377,7 @@ class _BasicInformationState extends State<BasicInformation> {
                   _buildTextField(
                     context: context,
                     label: 'Kodi postar',
-                    hint: '10000',
+                    hint: '30000',
                     controller: _postalCodeController,
                     keyboardType: TextInputType.number,
                   ),
