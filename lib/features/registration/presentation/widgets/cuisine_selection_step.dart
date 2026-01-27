@@ -54,7 +54,7 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
       widget.registrationData.kuzhina = _selectedCuisine;
 
       await _supabase
-          .from('restaurants')
+          .from('restorants')
           .insert(widget.registrationData.toJson());
 
       if (mounted) {

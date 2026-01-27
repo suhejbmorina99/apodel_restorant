@@ -63,7 +63,7 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
           null; // Clear cuisine for non-food categories
 
       await _supabase
-          .from('restaurants')
+          .from('restorants')
           .insert(widget.registrationData.toJson());
 
       if (mounted) {
