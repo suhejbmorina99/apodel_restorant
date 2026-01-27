@@ -51,11 +51,14 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
     });
 
     try {
+      final userId = _supabase.auth.currentUser?.id;
+
       widget.registrationData.kuzhina = _selectedCuisine;
 
-      await _supabase
-          .from('restorants')
-          .insert(widget.registrationData.toJson());
+      final data = widget.registrationData.toJson();
+      data['user_id'] = userId;
+
+      await _supabase.from('restorants').insert(data);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
