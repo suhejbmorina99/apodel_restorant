@@ -248,7 +248,7 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
                   CustomTextField(
@@ -338,28 +338,31 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                     },
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildTimePicker(
-                          context: context,
-                          label: 'Hapet nga',
-                          hint: 'Zgjidhni orën',
-                          time: _openingTime,
-                          onTap: () => _selectTime(context, true),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 50,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildTimePicker(
+                            context: context,
+                            label: 'Hapet nga',
+                            hint: 'Zgjidhni orën',
+                            time: _openingTime,
+                            onTap: () => _selectTime(context, true),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildTimePicker(
-                          context: context,
-                          label: 'Mbyllet në',
-                          hint: 'Zgjidhni orën',
-                          time: _closingTime,
-                          onTap: () => _selectTime(context, false),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildTimePicker(
+                            context: context,
+                            label: 'Mbyllet në',
+                            hint: 'Zgjidhni orën',
+                            time: _closingTime,
+                            onTap: () => _selectTime(context, false),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
