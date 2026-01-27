@@ -39,7 +39,7 @@ class BusinessRegistrationData {
       'qyteti': qyteti,
       'postal_code': postalCode,
       'adresa': adresa,
-      'kategorit': kategorite,
+      'kategorite': kategorite,
       'orari_hapjes': orariHapjes,
       'orari_mbylljes': orariMbylljes,
     };
