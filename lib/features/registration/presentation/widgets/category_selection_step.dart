@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:apodel_restorant/features/registration/models/business_registration_data.dart';
-import 'package:apodel_restorant/features/registration/presentation/widgets/custom_dropdown.dart';
 import 'package:apodel_restorant/features/registration/presentation/widgets/cuisine_selection_step.dart';
+import 'package:apodel_restorant/features/registration/presentation/widgets/custom_dropdown.dart';
 
 class CategorySelectionStep extends StatefulWidget {
   final BusinessRegistrationData registrationData;
@@ -16,8 +17,10 @@ class CategorySelectionStep extends StatefulWidget {
 
 class _CategorySelectionStepState extends State<CategorySelectionStep> {
   final _formKey = GlobalKey<FormState>();
+  final _supabase = Supabase.instance.client;
 
   String? _selectedCategory;
+  bool _isLoading = false;
 
   final List<String> _categories = [
     'Restaurant',
@@ -49,6 +52,55 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
         _foodRelatedCategories.contains(_selectedCategory);
   }
 
+  Future<void> _submitRegistration() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      widget.registrationData.kategorite = _selectedCategory;
+      widget.registrationData.kuzhina =
+          null; // Clear cuisine for non-food categories
+
+      await _supabase
+          .from('restaurants')
+          .insert(widget.registrationData.toJson());
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Biznesi u regjistrua me sukses!',
+              style: GoogleFonts.nunito(),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate back to login or home
+        Navigator.popUntil(context, (route) => route.isFirst);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Gabim: ${e.toString()}',
+              style: GoogleFonts.nunito(),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   void _continueToNextStep() {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -56,7 +108,7 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
 
     widget.registrationData.kategorite = _selectedCategory;
 
-    // If food-related, go to cuisine selection, otherwise skip to opening hours
+    // If food-related, go to cuisine selection, otherwise submit directly
     if (_isFoodRelated()) {
       Navigator.push(
         context,
@@ -65,6 +117,8 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
               CuisineSelectionStep(registrationData: widget.registrationData),
         ),
       );
+    } else {
+      _submitRegistration();
     }
   }
 
@@ -119,11 +173,13 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
                     width: MediaQuery.of(context).size.width - 50,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
-                        HapticFeedback.lightImpact();
-                        FocusScope.of(context).unfocus();
-                        _continueToNextStep();
-                      },
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              HapticFeedback.lightImpact();
+                              FocusScope.of(context).unfocus();
+                              _continueToNextStep();
+                            },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: const Color.fromARGB(255, 33, 33, 33),
                         backgroundColor: const Color.fromARGB(
@@ -136,14 +192,31 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
+                        disabledBackgroundColor: const Color.fromARGB(
+                          255,
+                          253,
+                          199,
+                          69,
+                        ).withOpacity(0.6),
                       ),
-                      child: Text(
-                        'Vazhdo',
-                        style: GoogleFonts.nunito(
-                          fontSize: 18,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Theme.of(context).colorScheme.onPrimary,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              _isFoodRelated() ? 'Vazhdo' : 'Përfundo',
+                              style: GoogleFonts.nunito(
+                                fontSize: 18,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 24),
