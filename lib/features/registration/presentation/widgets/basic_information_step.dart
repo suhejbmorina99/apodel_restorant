@@ -26,6 +26,8 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
   late final TextEditingController _adresaController;
 
   String? _selectedCountry;
+  TimeOfDay? _openingTime;
+  TimeOfDay? _closingTime;
 
   final List<String> _countries = ['Kosovë', 'Shqipëri'];
 
@@ -52,6 +54,14 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
       text: widget.registrationData.adresa,
     );
     _selectedCountry = widget.registrationData.shteti;
+
+    // Load existing times if any
+    if (widget.registrationData.orariHapjes != null) {
+      _openingTime = _parseTime(widget.registrationData.orariHapjes!);
+    }
+    if (widget.registrationData.orariMbylljes != null) {
+      _closingTime = _parseTime(widget.registrationData.orariMbylljes!);
+    }
   }
 
   @override
@@ -65,8 +75,68 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
     super.dispose();
   }
 
+  TimeOfDay? _parseTime(String time) {
+    try {
+      final parts = time.split(':');
+      return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context, bool isOpeningTime) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color.fromARGB(255, 253, 199, 69),
+              onPrimary: Colors.black,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isOpeningTime) {
+          _openingTime = picked;
+        } else {
+          _closingTime = picked;
+        }
+      });
+    }
+  }
+
+  String _formatTime(TimeOfDay? time) {
+    if (time == null) return '';
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
   void _continueToNextStep() {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    // Validate opening hours
+    if (_openingTime == null || _closingTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Ju lutem zgjidhni orarin e punës',
+            style: GoogleFonts.nunito(),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
@@ -80,6 +150,8 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
     widget.registrationData.qyteti = _cityController.text.trim();
     widget.registrationData.postalCode = _postalCodeController.text.trim();
     widget.registrationData.adresa = _adresaController.text.trim();
+    widget.registrationData.orariHapjes = _formatTime(_openingTime);
+    widget.registrationData.orariMbylljes = _formatTime(_closingTime);
 
     // Navigate to category selection
     Navigator.push(
@@ -88,6 +160,65 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
         builder: (context) =>
             CategorySelectionStep(registrationData: widget.registrationData),
       ),
+    );
+  }
+
+  Widget _buildTimePicker({
+    required BuildContext context,
+    required String label,
+    required String hint,
+    required TimeOfDay? time,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.nunito(
+            textStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        InkWell(
+          onTap: onTap,
+          child: Container(
+            width: MediaQuery.of(context).size.width - 50,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                width: 2,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  time != null ? _formatTime(time) : hint,
+                  style: GoogleFonts.nunito(
+                    color: time != null
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.secondary,
+                    fontSize: 14,
+                  ),
+                ),
+                Icon(
+                  Icons.access_time,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -205,6 +336,30 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                       }
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTimePicker(
+                          context: context,
+                          label: 'Hapet nga',
+                          hint: 'Zgjidhni orën',
+                          time: _openingTime,
+                          onTap: () => _selectTime(context, true),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildTimePicker(
+                          context: context,
+                          label: 'Mbyllet në',
+                          hint: 'Zgjidhni orën',
+                          time: _closingTime,
+                          onTap: () => _selectTime(context, false),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
