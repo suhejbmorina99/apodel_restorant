@@ -62,7 +62,7 @@ class _BasicInformationState extends State<BasicInformation> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Restoranti u regjistrua me sukses!',
+              'Biznesi u regjistrua me sukses!',
               style: GoogleFonts.nunito(),
             ),
             backgroundColor: Colors.green,
@@ -276,7 +276,7 @@ class _BasicInformationState extends State<BasicInformation> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         title: Text(
-          'Regjistro Restorantin',
+          'Regjistro Biznesin',
           style: GoogleFonts.nunito(
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimary,
