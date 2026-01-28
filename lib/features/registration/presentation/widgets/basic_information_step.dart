@@ -22,7 +22,6 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
   late final TextEditingController _numriIdentifikuesController;
   late final TextEditingController _numriMobilController;
   late final TextEditingController _cityController;
-
   late final TextEditingController _adresaController;
 
   String? _selectedCountry;
@@ -436,7 +435,6 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
               // Phone Number Input
               Expanded(
                 child: SizedBox(
-                  height: 50,
                   child: TextFormField(
                     controller: _numriMobilController,
                     keyboardType: TextInputType.phone,
