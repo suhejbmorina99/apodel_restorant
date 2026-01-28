@@ -22,7 +22,7 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
   late final TextEditingController _numriIdentifikuesController;
   late final TextEditingController _numriMobilController;
   late final TextEditingController _cityController;
-  late final TextEditingController _postalCodeController;
+
   late final TextEditingController _adresaController;
 
   String? _selectedCountry;
@@ -46,9 +46,7 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
     _cityController = TextEditingController(
       text: widget.registrationData.qyteti,
     );
-    _postalCodeController = TextEditingController(
-      text: widget.registrationData.postalCode,
-    );
+
     _adresaController = TextEditingController(
       text: widget.registrationData.adresa,
     );
@@ -92,7 +90,6 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
     _numriIdentifikuesController.dispose();
     _numriMobilController.dispose();
     _cityController.dispose();
-    _postalCodeController.dispose();
     _adresaController.dispose();
     super.dispose();
   }
@@ -186,7 +183,6 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
     widget.registrationData.numriMobil = _completePhoneNumber;
     widget.registrationData.shteti = _selectedCountry;
     widget.registrationData.qyteti = _cityController.text.trim();
-    widget.registrationData.postalCode = _postalCodeController.text.trim();
     widget.registrationData.adresa = _adresaController.text.trim();
     widget.registrationData.orariHapjes = _formatTime(_openingTime);
     widget.registrationData.orariMbylljes = _formatTime(_closingTime);
@@ -219,58 +215,24 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
         const SizedBox(height: 10),
         SizedBox(
           width: MediaQuery.of(context).size.width - 50,
+          height: 50,
           child: InkWell(
             onTap: () {
               showCountryPicker(
                 context: context,
+                countryFilter: ['XK', 'AL'],
+                showSearch: false,
                 countryListTheme: CountryListThemeData(
-                  flagSize: 25,
+                  flagSize: 32,
                   backgroundColor: Theme.of(context).colorScheme.surface,
                   textStyle: GoogleFonts.nunito(
                     fontSize: 16,
                     color: Theme.of(context).colorScheme.onPrimary,
                   ),
-                  bottomSheetHeight: 500,
+                  bottomSheetHeight: 140,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
-                  ),
-                  inputDecoration: InputDecoration(
-                    labelText: 'Kërko',
-                    labelStyle: GoogleFonts.nunito(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    hintText: 'Shkruani emrin e shtetit',
-                    hintStyle: GoogleFonts.nunito(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(
-                        color: Color.fromARGB(255, 253, 199, 69),
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  searchTextStyle: GoogleFonts.nunito(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    fontSize: 16,
                   ),
                 ),
                 onSelect: (Country country) {
@@ -278,12 +240,10 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                     _selectedCountry = country.name;
                   });
                 },
-                // Show only Kosovo and Albania by default
-                favorite: ['XK', 'AL'],
               );
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(14),
@@ -294,14 +254,18 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  Text(
-                    _selectedCountry ?? 'Zgjidhni shtetin',
-                    style: GoogleFonts.nunito(
-                      color: _selectedCountry != null
-                          ? Theme.of(context).colorScheme.onPrimary
-                          : Theme.of(context).colorScheme.secondary,
-                      fontSize: 14,
+                  Expanded(
+                    child: Text(
+                      _selectedCountry ?? 'Zgjidhni shtetin',
+                      style: GoogleFonts.nunito(
+                        color: _selectedCountry != null
+                            ? Theme.of(context).colorScheme.onPrimary
+                            : Theme.of(context).colorScheme.secondary,
+                        fontSize: 14,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Icon(
@@ -370,7 +334,7 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                                 style: TextStyle(fontSize: 32),
                               ),
                               title: Text(
-                                'Kosovë',
+                                'Kosovo',
                                 style: GoogleFonts.nunito(
                                   color: Theme.of(
                                     context,
@@ -401,7 +365,7 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                                 style: TextStyle(fontSize: 32),
                               ),
                               title: Text(
-                                'Shqipëri',
+                                'Albania',
                                 style: GoogleFonts.nunito(
                                   color: Theme.of(
                                     context,
@@ -683,18 +647,12 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                     },
                   ),
                   const SizedBox(height: 12),
-                  CustomTextField(
-                    label: 'Kodi postar',
-                    hint: '30000',
-                    controller: _postalCodeController,
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 12),
+
                   CustomTextField(
                     label: 'Adresa e biznesit',
                     hint: 'Rruga, numri i objektit',
                     controller: _adresaController,
-                    maxLines: 2,
+                    maxLines: 1,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Ju lutem shkruani adresen';
