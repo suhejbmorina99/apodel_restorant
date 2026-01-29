@@ -22,32 +22,32 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
   bool _showValidationError = false;
 
   final List<String> _categories = [
-    'Restaurant',
+    'Restorant',
     'Fast Food',
-    'Pub',
-    'Café',
+    'Pub Lounge',
+    'Kafe',
     'Bar',
-    'Bakery',
-    'Pizzeria',
+    'Furrë buke',
+    'Picerí',
     'Market',
     'Tjetër',
   ];
 
   final List<String> _foodRelatedCategories = [
-    'Restaurant',
+    'Restorant',
     'Fast Food',
-    'Pizzeria',
-    'Bakery',
+    'Picerí',
+    'Furrë buke',
   ];
 
   final Map<String, IconData> _categoryIcons = {
-    'Restaurant': Icons.restaurant,
+    'Restorant': Icons.restaurant,
     'Fast Food': Icons.fastfood,
-    'Pub': Icons.sports_bar,
-    'Café': Icons.coffee,
+    'Pub Lounge': Icons.sports_bar,
+    'Kafe': Icons.coffee,
     'Bar': Icons.local_bar,
-    'Bakery': Icons.bakery_dining,
-    'Pizzeria': Icons.local_pizza,
+    'Furrë buke': Icons.bakery_dining,
+    'Picerí': Icons.local_pizza,
     'Market': Icons.store,
     'Tjetër': Icons.category,
   };

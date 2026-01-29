@@ -66,7 +66,7 @@ class _SplashScreen extends State<SplashScreen>
               );
               final DateTime now = DateTime.now();
 
-              if (isEmailVerified && now.difference(lastLogin).inMinutes < 5) {
+              if (isEmailVerified && now.difference(lastLogin).inMinutes < 30) {
                 if (mounted) {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
