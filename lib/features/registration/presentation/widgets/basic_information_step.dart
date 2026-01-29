@@ -144,34 +144,6 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
       return;
     }
 
-    // Validate country selection
-    if (_selectedCountry == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Ju lutem zgjidhni shtetin',
-            style: GoogleFonts.nunito(),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // Validate opening hours
-    if (_openingTime == null || _closingTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Ju lutem zgjidhni orarin e punës',
-            style: GoogleFonts.nunito(),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
     // Save data to the model
     widget.registrationData.emriBiznesit = _emriBiznesitController.text.trim();
     widget.registrationData.numriIdentifikues = _numriIdentifikuesController
@@ -624,6 +596,8 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Ju lutem shkruani numrin identifikues';
+                      } else if (value.length > 9 || value.length < 9) {
+                        return 'Ju lutem shkruani 9 shifrat';
                       }
                       return null;
                     },
