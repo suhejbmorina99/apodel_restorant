@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -8,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final int maxLines;
   final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextField({
     super.key,
@@ -17,6 +19,7 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType,
     this.maxLines = 1,
     this.validator,
+    this.inputFormatters,
   });
 
   @override
@@ -42,6 +45,7 @@ class CustomTextField extends StatelessWidget {
             controller: controller,
             keyboardType: keyboardType,
             maxLines: maxLines,
+            inputFormatters: inputFormatters, // Add this line
             style: GoogleFonts.nunito(
               color: Theme.of(context).colorScheme.onPrimary,
               fontSize: 14,

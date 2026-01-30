@@ -183,6 +183,10 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                     hint: 'Numri identifikues i biznesit',
                     controller: _numriIdentifikuesController,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(9),
+                    ],
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Ju lutem shkruani numrin identifikues';
