@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:apodel_restorant/features/registration/models/business_registration_data.dart';
-import 'package:apodel_restorant/features/registration/presentation/widgets/custom_dropdown.dart';
 
 class CuisineSelectionStep extends StatefulWidget {
   final BusinessRegistrationData registrationData;
@@ -15,11 +14,11 @@ class CuisineSelectionStep extends StatefulWidget {
 }
 
 class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
-  final _formKey = GlobalKey<FormState>();
   final _supabase = Supabase.instance.client;
 
   String? _selectedCuisine;
   bool _isLoading = false;
+  bool _showValidationError = false;
 
   final List<String> _cuisines = [
     'Shqiptare',
@@ -29,11 +28,25 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
     'Kineze',
     'Indiane',
     'Meksikane',
-    'Japoneze',
-    'Turke',
     'E përzier',
+    'Turke',
+    'Japoneze',
     'Tjetër',
   ];
+
+  final Map<String, IconData> _cuisineIcons = {
+    'Shqiptare': Icons.restaurant,
+    'Italiane': Icons.local_pizza,
+    'Mesdhetare': Icons.set_meal,
+    'Amerikane': Icons.fastfood,
+    'Kineze': Icons.ramen_dining,
+    'Indiane': Icons.rice_bowl,
+    'Meksikane': Icons.local_dining,
+    'E përzier': Icons.layers,
+    'Turke': Icons.kebab_dining,
+    'Japoneze': Icons.ramen_dining_outlined,
+    'Tjetër': Icons.category,
+  };
 
   @override
   void initState() {
@@ -41,14 +54,14 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
     _selectedCuisine = widget.registrationData.kuzhina;
   }
 
-  Future<void> _submitRegistration() async {
-    if (!_formKey.currentState!.validate()) {
+  void _submitRegistration() async {
+    if (_selectedCuisine == null) {
+      HapticFeedback.lightImpact();
+      setState(() => _showValidationError = true);
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       final userId = _supabase.auth.currentUser?.id;
@@ -60,142 +73,186 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
 
       await _supabase.from('restorants').insert(data);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Restoranti u regjistrua me sukses!',
-              style: GoogleFonts.nunito(),
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
+      if (!mounted) return;
 
-        // Navigate back to login or home
-        Navigator.popUntil(context, (route) => route.isFirst);
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Restoranti u regjistrua me sukses!',
+            style: GoogleFonts.nunito(),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Gabim: ${e.toString()}',
-              style: GoogleFonts.nunito(),
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gabim: ${e.toString()}', style: GoogleFonts.nunito()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Widget _buildCuisineGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _cuisines.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 0.95,
+      ),
+      itemBuilder: (context, index) {
+        final cuisine = _cuisines[index];
+        final isSelected = _selectedCuisine == cuisine;
+
+        return GestureDetector(
+          onTap: () {
+            HapticFeedback.selectionClick();
+            setState(() {
+              _selectedCuisine = cuisine;
+              _showValidationError = false;
+            });
+          },
+          child: AnimatedScale(
+            scale: isSelected ? 1.05 : 1.0,
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: isSelected
+                    ? const Color.fromARGB(255, 253, 199, 69)
+                    : Theme.of(context).colorScheme.surface,
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 10,
+                          offset: const Offset(0, 6),
+                        ),
+                      ]
+                    : [],
+                border: Border.all(
+                  width: 2,
+                  color: isSelected
+                      ? const Color.fromARGB(255, 253, 199, 69)
+                      : Colors.grey.shade300,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _cuisineIcons[cuisine],
+                    size: 30,
+                    color: isSelected
+                        ? Colors.black
+                        : Theme.of(context).colorScheme.onPrimary,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    cuisine,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.nunito(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? Colors.black
+                          : Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            backgroundColor: Colors.red,
           ),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           'Lloji i Kuzhinës',
           style: GoogleFonts.nunito(
-            textStyle: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 16),
-          child: Center(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  CustomDropdown(
-                    label: 'Lloji i kuzhinës',
-                    hint: 'Zgjidhni llojin e kuzhinës',
-                    value: _selectedCuisine,
-                    items: _cuisines,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedCuisine = newValue;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ju lutem zgjidhni llojin e kuzhinës';
-                      }
-                      return null;
-                    },
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
                   ),
-                  const Spacer(),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width - 50,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isLoading
-                          ? null
-                          : () {
-                              HapticFeedback.lightImpact();
-                              FocusScope.of(context).unfocus();
-                              _submitRegistration();
-                            },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: const Color.fromARGB(255, 33, 33, 33),
-                        backgroundColor: const Color.fromARGB(
-                          255,
-                          253,
-                          199,
-                          69,
+                  children: [
+                    _buildCuisineGrid(),
+
+                    if (_showValidationError && _selectedCuisine == null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(
+                          'Ju lutem zgjidhni llojin e kuzhinës',
+                          style: GoogleFonts.nunito(
+                            color: Colors.red,
+                            fontSize: 13,
+                          ),
                         ),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        disabledBackgroundColor: const Color.fromARGB(
-                          255,
-                          253,
-                          199,
-                          69,
-                        ).withOpacity(0.6),
                       ),
-                      child: _isLoading
-                          ? SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).colorScheme.onPrimary,
-                                ),
-                              ),
-                            )
-                          : Text(
-                              'Përfundo',
-                              style: GoogleFonts.nunito(
-                                fontSize: 18,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                              ),
-                            ),
+
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+
+              SizedBox(
+                width: MediaQuery.of(context).size.width - 50,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _submitRegistration,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 253, 199, 69),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                ],
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          'Përfundo',
+                          style: GoogleFonts.nunito(fontSize: 18),
+                        ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

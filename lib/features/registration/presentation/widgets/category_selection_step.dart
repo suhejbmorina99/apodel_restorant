@@ -28,7 +28,7 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
     'Kafe',
     'Bar',
     'Furrë buke',
-    'Picerí',
+    'Piceri',
     'Market',
     'Tjetër',
   ];
@@ -36,7 +36,7 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
   final List<String> _foodRelatedCategories = [
     'Restorant',
     'Fast Food',
-    'Picerí',
+    'Piceri',
     'Furrë buke',
   ];
 
@@ -47,7 +47,7 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
     'Kafe': Icons.coffee,
     'Bar': Icons.local_bar,
     'Furrë buke': Icons.bakery_dining,
-    'Picerí': Icons.local_pizza,
+    'Piceri': Icons.local_pizza,
     'Market': Icons.store,
     'Tjetër': Icons.category,
   };

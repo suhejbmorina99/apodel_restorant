@@ -260,7 +260,7 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                     closingTime: _closingTime,
                     onSelectTime: _selectTime,
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 42),
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 50,
                     height: 50,
