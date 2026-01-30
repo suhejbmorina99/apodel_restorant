@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,23 +80,108 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
   }
 
   Future<void> _selectTime(BuildContext context, bool isOpeningTime) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color.fromARGB(255, 253, 199, 69),
-              onPrimary: Colors.black,
-              surface: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
+    TimeOfDay? picked;
+
+    if (Platform.isIOS) {
+      // iOS: Show Cupertino Time Picker
+      DateTime initialDateTime = DateTime.now();
+      if (isOpeningTime && _openingTime != null) {
+        initialDateTime = DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+          _openingTime!.hour,
+          _openingTime!.minute,
         );
-      },
-    );
+      } else if (!isOpeningTime && _closingTime != null) {
+        initialDateTime = DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+          _closingTime!.hour,
+          _closingTime!.minute,
+        );
+      }
+
+      await showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          DateTime tempPickedDate = initialDateTime;
+          return Container(
+            height: 250,
+            color: Theme.of(context).colorScheme.surface,
+            child: Column(
+              children: [
+                Container(
+                  height: 50,
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CupertinoButton(
+                        child: Text(
+                          'Anulo',
+                          style: GoogleFonts.nunito(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      CupertinoButton(
+                        child: Text(
+                          'Cakto',
+                          style: GoogleFonts.nunito(
+                            color: const Color.fromARGB(255, 253, 199, 69),
+                          ),
+                        ),
+                        onPressed: () {
+                          picked = TimeOfDay(
+                            hour: tempPickedDate.hour,
+                            minute: tempPickedDate.minute,
+                          );
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.time,
+                    initialDateTime: initialDateTime,
+                    use24hFormat: true,
+                    onDateTimeChanged: (DateTime newDateTime) {
+                      tempPickedDate = newDateTime;
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      // Android/Other: Show Material Time Picker
+      picked = await showTimePicker(
+        context: context,
+        initialTime: isOpeningTime
+            ? (_openingTime ?? TimeOfDay.now())
+            : (_closingTime ?? TimeOfDay.now()),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+              colorScheme: const ColorScheme.light(
+                primary: Color.fromARGB(255, 253, 199, 69),
+                onPrimary: Colors.black,
+                surface: Colors.white,
+                onSurface: Colors.black,
+              ),
+            ),
+            child: child!,
+          );
+        },
+      );
+    }
 
     if (picked != null) {
       setState(() {
