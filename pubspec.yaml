@@ -78,6 +78,7 @@ flutter:
 
     # Animations
     - assets/animations/splash.json
+    - assets/animations/under_review.json
 
     # Env
     - .env

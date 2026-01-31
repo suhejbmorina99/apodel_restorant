@@ -35,8 +35,7 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
             children: [
               // Lottie Animation
               Lottie.asset(
-                'assets/animations/processing.json',
-                width: 250,
+                'assets/animations/under_review.json',
                 height: 250,
                 fit: BoxFit.contain,
                 repeat: true,
@@ -105,10 +104,7 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
                   ),
                   child: Text(
                     'Kthehu në Fillim',
-                    style: GoogleFonts.nunito(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: GoogleFonts.nunito(fontSize: 18),
                   ),
                 ),
               ),
