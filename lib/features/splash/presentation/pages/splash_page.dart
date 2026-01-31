@@ -1,3 +1,4 @@
+import 'package:apodel_restorant/features/registration/presentation/widgets/processing_information.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // import 'package:google_fonts/google_fonts.dart';
@@ -43,44 +44,62 @@ class _SplashScreen extends State<SplashScreen>
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     _controller =
-        AnimationController(
-          duration: const Duration(seconds: 5),
-          vsync: this,
-        )..addStatusListener((status) async {
-          if (status == AnimationStatus.completed) {
-            // final bool isSubscribed = await isUserSubscribed();
+        AnimationController(duration: const Duration(seconds: 5), vsync: this)
+          ..addStatusListener((status) async {
+            if (status == AnimationStatus.completed) {
+              // final bool isSubscribed = await isUserSubscribed();
 
-            final SharedPreferences preferences =
-                await SharedPreferences.getInstance();
-            // await preferences.setBool('isSubscribed', isSubscribed);
+              final SharedPreferences preferences =
+                  await SharedPreferences.getInstance();
+              // await preferences.setBool('isSubscribed', isSubscribed);
 
-            final bool isEmailVerified =
-                preferences.getBool('isEmailVerified') ?? false;
-            final int? lastLoginTimestamp = preferences.getInt(
-              'lastLoginTimestamp',
-            );
-
-            if (lastLoginTimestamp != null) {
-              final DateTime lastLogin = DateTime.fromMillisecondsSinceEpoch(
-                lastLoginTimestamp,
+              final bool isEmailVerified =
+                  preferences.getBool('isEmailVerified') ?? false;
+              final int? lastLoginTimestamp = preferences.getInt(
+                'lastLoginTimestamp',
               );
-              final DateTime now = DateTime.now();
+              final bool isRegistrationCompleted =
+                  preferences.getBool('registration_completed') ?? false;
 
-              if (isEmailVerified && now.difference(lastLogin).inMinutes < 30) {
-                if (mounted) {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => const BusinessRegistration(),
-                    ),
-                  );
-                }
-              } else if (!isEmailVerified) {
-                if (mounted) {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => const EmailVerificationScreen(),
-                    ),
-                  );
+              if (lastLoginTimestamp != null) {
+                final DateTime lastLogin = DateTime.fromMillisecondsSinceEpoch(
+                  lastLoginTimestamp,
+                );
+                final DateTime now = DateTime.now();
+
+                if (isRegistrationCompleted &&
+                    isEmailVerified &&
+                    now.difference(lastLogin).inMinutes < 30) {
+                  if (mounted) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const ProcessingInformation(),
+                      ),
+                    );
+                  }
+                } else if (isEmailVerified &&
+                    now.difference(lastLogin).inMinutes < 30) {
+                  if (mounted) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const BusinessRegistration(),
+                      ),
+                    );
+                  }
+                } else if (!isEmailVerified) {
+                  if (mounted) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const EmailVerificationScreen(),
+                      ),
+                    );
+                  }
+                } else {
+                  if (mounted) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  }
                 }
               } else {
                 if (mounted) {
@@ -89,15 +108,8 @@ class _SplashScreen extends State<SplashScreen>
                   );
                 }
               }
-            } else {
-              if (mounted) {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
-              }
             }
-          }
-        });
+          });
 
     _controller.forward();
   }

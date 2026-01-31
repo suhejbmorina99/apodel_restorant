@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:apodel_restorant/features/registration/models/business_registration_data.dart';
+import 'package:apodel_restorant/features/registration/presentation/widgets/processing_information.dart';
 
 class PartnerPlanStep extends StatefulWidget {
   final BusinessRegistrationData registrationData;
@@ -34,21 +36,28 @@ class _PartnerPlanStepState extends State<PartnerPlanStep> {
       data['delivery_plan'] = _selectedDeliveryOption;
       data['pickup_enabled'] = _pickupEnabled;
 
+      // Set initial registration status to 'processing'
+      data['registration_status'] = 'processing';
+
       await _supabase.from('restorants').insert(data);
+
+      // Save to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('registration_status', 'processing');
+      await prefs.setBool('registration_completed', true);
+      await prefs.setString(
+        'restaurant_id',
+        data['id'] ?? '',
+      ); // Save restaurant ID if needed
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Biznesi u regjistrua me sukses!',
-            style: GoogleFonts.nunito(),
-          ),
-          backgroundColor: Colors.green,
-        ),
+      // Navigate to Processing Information screen
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const ProcessingInformation()),
+        (route) => false,
       );
-
-      Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       if (!mounted) return;
 
