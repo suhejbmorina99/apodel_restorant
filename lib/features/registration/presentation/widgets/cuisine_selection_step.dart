@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:apodel_restorant/features/registration/models/business_registration_data.dart';
+import 'package:apodel_restorant/features/registration/presentation/widgets/partner_plan.dart';
 
 class CuisineSelectionStep extends StatefulWidget {
   final BusinessRegistrationData registrationData;
@@ -14,10 +14,7 @@ class CuisineSelectionStep extends StatefulWidget {
 }
 
 class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
-  final _supabase = Supabase.instance.client;
-
   String? _selectedCuisine;
-  bool _isLoading = false;
   bool _showValidationError = false;
 
   final List<String> _cuisines = [
@@ -54,50 +51,22 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
     _selectedCuisine = widget.registrationData.kuzhina;
   }
 
-  void _submitRegistration() async {
+  void _continueToPartnerPlan() {
     if (_selectedCuisine == null) {
       HapticFeedback.lightImpact();
       setState(() => _showValidationError = true);
       return;
     }
 
-    setState(() => _isLoading = true);
+    widget.registrationData.kuzhina = _selectedCuisine;
 
-    try {
-      final userId = _supabase.auth.currentUser?.id;
-
-      widget.registrationData.kuzhina = _selectedCuisine;
-
-      final data = widget.registrationData.toJson();
-      data['user_id'] = userId;
-
-      await _supabase.from('restorants').insert(data);
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Restoranti u regjistrua me sukses!',
-            style: GoogleFonts.nunito(),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.popUntil(context, (route) => route.isFirst);
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gabim: ${e.toString()}', style: GoogleFonts.nunito()),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            PartnerPlanStep(registrationData: widget.registrationData),
+      ),
+    );
   }
 
   Widget _buildCuisineGrid() {
@@ -232,7 +201,7 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
                 width: MediaQuery.of(context).size.width - 50,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _submitRegistration,
+                  onPressed: _continueToPartnerPlan,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 253, 199, 69),
                     foregroundColor: Colors.black,
@@ -240,16 +209,13 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(
-                          'Përfundo',
-                          style: GoogleFonts.nunito(fontSize: 18),
-                        ),
+                  child: Text(
+                    'Vazhdo',
+                    style: GoogleFonts.nunito(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
             ],

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:apodel_restorant/features/registration/models/business_registration_data.dart';
 import 'package:apodel_restorant/features/registration/presentation/widgets/cuisine_selection_step.dart';
+import 'package:apodel_restorant/features/registration/presentation/widgets/partner_plan.dart';
 
 class CategorySelectionStep extends StatefulWidget {
   final BusinessRegistrationData registrationData;
@@ -15,10 +15,7 @@ class CategorySelectionStep extends StatefulWidget {
 }
 
 class _CategorySelectionStepState extends State<CategorySelectionStep> {
-  final _supabase = Supabase.instance.client;
-
   String? _selectedCategory;
-  bool _isLoading = false;
   bool _showValidationError = false;
 
   final List<String> _categories = [
@@ -63,47 +60,6 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
         _foodRelatedCategories.contains(_selectedCategory);
   }
 
-  Future<void> _submitRegistration() async {
-    setState(() => _isLoading = true);
-
-    try {
-      final userId = _supabase.auth.currentUser?.id;
-
-      widget.registrationData.kategorite = _selectedCategory;
-      widget.registrationData.kuzhina = null;
-
-      final data = widget.registrationData.toJson();
-      data['user_id'] = userId;
-
-      await _supabase.from('restorants').insert(data);
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Biznesi u regjistrua me sukses!',
-            style: GoogleFonts.nunito(),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.popUntil(context, (route) => route.isFirst);
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gabim: ${e.toString()}', style: GoogleFonts.nunito()),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
   void _continueToNextStep() {
     if (_selectedCategory == null) {
       HapticFeedback.lightImpact();
@@ -116,7 +72,7 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
     _showValidationError = false;
     widget.registrationData.kategorite = _selectedCategory;
 
-    // If food-related, go to cuisine selection, otherwise submit directly
+    // If food-related, go to cuisine selection, otherwise go to partner plan
     if (_isFoodRelated()) {
       Navigator.push(
         context,
@@ -126,7 +82,15 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
         ),
       );
     } else {
-      _submitRegistration();
+      // For non-food businesses, clear cuisine and go to partner plan
+      widget.registrationData.kuzhina = null;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              PartnerPlanStep(registrationData: widget.registrationData),
+        ),
+      );
     }
   }
 
@@ -259,7 +223,7 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
                 width: MediaQuery.of(context).size.width - 50,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _continueToNextStep,
+                  onPressed: _continueToNextStep,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 253, 199, 69),
                     foregroundColor: Colors.black,
@@ -267,16 +231,10 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(
-                          _isFoodRelated() ? 'Vazhdo' : 'Përfundo',
-                          style: GoogleFonts.nunito(fontSize: 18),
-                        ),
+                  child: Text(
+                    'Vazhdo',
+                    style: GoogleFonts.nunito(fontSize: 18),
+                  ),
                 ),
               ),
             ],
