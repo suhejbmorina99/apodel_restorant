@@ -242,113 +242,120 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 16),
           child: Center(
             child: Form(
               key: _formKey,
               child: Column(
                 children: [
-                  // const SizedBox(height: 10),
-                  CustomTextField(
-                    label: 'Emri i biznesit',
-                    hint: 'Emri i restorantit tuaj',
-                    controller: _emriBiznesitController,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Ju lutem shkruani emrin e biznesit';
-                      }
-                      return null;
-                    },
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          CustomTextField(
+                            label: 'Emri i biznesit',
+                            hint: 'Emri i restorantit tuaj',
+                            controller: _emriBiznesitController,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Ju lutem shkruani emrin e biznesit';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            label: 'Numri unik identifikues',
+                            hint: 'Numri identifikues i biznesit',
+                            controller: _numriIdentifikuesController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(9),
+                            ],
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Ju lutem shkruani numrin identifikues';
+                              } else if (value.length != 9) {
+                                return 'Ju lutem shkruani 9 shifrat';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          CustomPhoneField(
+                            label: 'Numri mobil i biznesit',
+                            hint: '44 123 456',
+                            controller: _numriMobilController,
+                            onPhoneChanged: (phone) {
+                              _completePhoneNumber = phone;
+                            },
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Ju lutem shkruani numrin mobil';
+                              }
+                              final digitsOnly = value.replaceAll(' ', '');
+                              if (digitsOnly.length != 8) {
+                                return 'Numri duhet të ketë 8 shifra';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          CustomDropdown(
+                            label: 'Shteti',
+                            hint: 'Zgjidhni shtetin',
+                            value: _selectedCountry,
+                            items: const ['Kosova', 'Albania'],
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedCountry = newValue;
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Ju lutem zgjidhni shtetin';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            label: 'Qyteti',
+                            hint: 'Emri i qytetit',
+                            controller: _cityController,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Ju lutem shkruani qytetin';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            label: 'Adresa e biznesit',
+                            hint: 'Rruga, numri i objektit',
+                            controller: _adresaController,
+                            maxLines: 1,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Ju lutem shkruani adresen';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTimePickerRow(
+                            openingTime: _openingTime,
+                            closingTime: _closingTime,
+                            onSelectTime: _selectTime,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  CustomTextField(
-                    label: 'Numri unik identifikues',
-                    hint: 'Numri identifikues i biznesit',
-                    controller: _numriIdentifikuesController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(9),
-                    ],
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Ju lutem shkruani numrin identifikues';
-                      } else if (value.length != 9) {
-                        return 'Ju lutem shkruani 9 shifrat';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  CustomPhoneField(
-                    label: 'Numri mobil i biznesit',
-                    hint: '44 123 456',
-                    controller: _numriMobilController,
-                    onPhoneChanged: (phone) {
-                      _completePhoneNumber = phone;
-                    },
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Ju lutem shkruani numrin mobil';
-                      }
-                      final digitsOnly = value.replaceAll(' ', '');
-                      if (digitsOnly.length != 8) {
-                        return 'Numri duhet të ketë 8 shifra';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  CustomDropdown(
-                    label: 'Shteti',
-                    hint: 'Zgjidhni shtetin',
-                    value: _selectedCountry,
-                    items: const ['Kosova', 'Albania'],
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedCountry = newValue;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Ju lutem zgjidhni shtetin';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  CustomTextField(
-                    label: 'Qyteti',
-                    hint: 'Emri i qytetit',
-                    controller: _cityController,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Ju lutem shkruani qytetin';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  CustomTextField(
-                    label: 'Adresa e biznesit',
-                    hint: 'Rruga, numri i objektit',
-                    controller: _adresaController,
-                    maxLines: 1,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Ju lutem shkruani adresen';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  CustomTimePickerRow(
-                    openingTime: _openingTime,
-                    closingTime: _closingTime,
-                    onSelectTime: _selectTime,
-                  ),
-                  const SizedBox(height: 42),
+
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 50,
                     height: 50,

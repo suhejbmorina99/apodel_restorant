@@ -213,7 +213,7 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
                     'Vazhdo',
                     style: GoogleFonts.nunito(
                       fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 ),

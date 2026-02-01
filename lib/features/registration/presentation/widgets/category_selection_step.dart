@@ -233,7 +233,10 @@ class _CategorySelectionStepState extends State<CategorySelectionStep> {
                   ),
                   child: Text(
                     'Vazhdo',
-                    style: GoogleFonts.nunito(fontSize: 18),
+                    style: GoogleFonts.nunito(
+                      fontSize: 18,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                   ),
                 ),
               ),

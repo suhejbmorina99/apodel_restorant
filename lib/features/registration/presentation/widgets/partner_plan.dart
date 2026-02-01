@@ -454,7 +454,10 @@ class _PartnerPlanStepState extends State<PartnerPlanStep> {
                         )
                       : Text(
                           'Përfundo Regjistrimin',
-                          style: GoogleFonts.nunito(fontSize: 18),
+                          style: GoogleFonts.nunito(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
                         ),
                 ),
               ),

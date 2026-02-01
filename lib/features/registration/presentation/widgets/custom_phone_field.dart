@@ -76,7 +76,10 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                             ListTile(
                               leading: const Text(
                                 '🇽🇰',
-                                style: TextStyle(fontSize: 32),
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  color: Colors.black,
+                                ),
                               ),
                               title: Text(
                                 'Kosova',
@@ -106,7 +109,10 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                             ListTile(
                               leading: const Text(
                                 '🇦🇱',
-                                style: TextStyle(fontSize: 32),
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  color: Colors.black,
+                                ),
                               ),
                               title: Text(
                                 'Albania',

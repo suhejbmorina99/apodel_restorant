@@ -183,7 +183,10 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
                         )
                       : Text(
                           'Kontrolloni Statusin',
-                          style: GoogleFonts.nunito(fontSize: 18),
+                          style: GoogleFonts.nunito(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
                         ),
                 ),
               ),
