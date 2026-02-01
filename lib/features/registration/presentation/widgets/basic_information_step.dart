@@ -308,7 +308,7 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
                     label: 'Shteti',
                     hint: 'Zgjidhni shtetin',
                     value: _selectedCountry,
-                    items: const ['Kosovo', 'Albania'],
+                    items: const ['Kosova', 'Albania'],
                     onChanged: (String? newValue) {
                       setState(() {
                         _selectedCountry = newValue;

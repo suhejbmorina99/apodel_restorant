@@ -80,7 +80,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
                                 style: TextStyle(fontSize: 32),
                               ),
                               title: Text(
-                                'Kosovo',
+                                'Kosova',
                                 style: GoogleFonts.nunito(
                                   color: Theme.of(
                                     context,

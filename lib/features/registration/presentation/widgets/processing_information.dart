@@ -1,10 +1,10 @@
-import 'package:apodel_restorant/features/splash/presentation/pages/splash_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:apodel_restorant/features/splash/presentation/pages/splash_page.dart';
 
 class ProcessingInformation extends StatefulWidget {
   const ProcessingInformation({super.key});
@@ -48,15 +48,38 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
       final String status =
           response['registration_status'] as String? ?? 'processing';
 
-      // Update SharedPreferences with latest status from DB
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('registration_status', status);
 
       if (!mounted) return;
 
       if (status == 'approved') {
-        // Show rejection dialog
-        Navigator.push(
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SplashScreen()),
+        );
+      } else if (status == 'rejected') {
+        // Delete the row from database
+        await _supabase.from('restorants').delete().eq('user_id', userId);
+
+        // Clear registration data from SharedPreferences
+        await prefs.remove('registration_completed');
+        await prefs.remove('registration_status');
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Ekipi i apodel ka refuzuar regjistrimin tuaj.',
+              style: GoogleFonts.nunito(),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        // Go to splash so it routes to BusinessRegistration
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => SplashScreen()),
         );
