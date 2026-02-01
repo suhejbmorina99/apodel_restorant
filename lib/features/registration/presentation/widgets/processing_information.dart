@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProcessingInformation extends StatefulWidget {
   const ProcessingInformation({super.key});
@@ -11,16 +13,102 @@ class ProcessingInformation extends StatefulWidget {
 }
 
 class _ProcessingInformationState extends State<ProcessingInformation> {
-  @override
-  void initState() {
-    super.initState();
-    _saveRegistrationStatus();
+  final _supabase = Supabase.instance.client;
+  bool _isChecking = false;
+
+  Future<void> _checkRegistrationStatus() async {
+    setState(() => _isChecking = true);
+
+    try {
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+
+      if (firebaseUser == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Sesioni ka skaduar. Ju lutem hyni sërishmi.',
+              style: GoogleFonts.nunito(),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final userId = firebaseUser.uid;
+
+      final response = await _supabase
+          .from('restorants')
+          .select('registration_status')
+          .eq('user_id', userId)
+          .single();
+
+      final String status =
+          response['registration_status'] as String? ?? 'processing';
+
+      // Update SharedPreferences with latest status from DB
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('registration_status', status);
+
+      if (!mounted) return;
+
+      if (status == 'rejected') {
+        // Show rejection dialog
+        _showRejectionDialog();
+      }
+      // If still 'processing', do nothing, stay on this screen
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gabim: ${e.toString()}', style: GoogleFonts.nunito()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isChecking = false);
+    }
   }
 
-  Future<void> _saveRegistrationStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('registration_status', 'processing');
-    await prefs.setBool('registration_completed', true);
+  void _showRejectionDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Regjistrimi u Refuzua',
+          style: GoogleFonts.nunito(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
+        content: Text(
+          'Regjistrimi juaj u refuzuar nga ekipi ynë. Ju mund t\'a mundoni mal herë ose t\'i kontaktoni mbështetjen tonë.',
+          style: GoogleFonts.nunito(color: Colors.grey.shade600),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.popUntil(context, (route) => route.isFirst);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 253, 199, 69),
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Mirëkuptim',
+              style: GoogleFonts.nunito(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -33,7 +121,6 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Lottie Animation
               Lottie.asset(
                 'assets/animations/under_review.json',
                 height: 250,
@@ -42,7 +129,6 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
               ),
               const SizedBox(height: 40),
 
-              // Title
               Text(
                 'Regjistrimi Juaj Po Processohet',
                 textAlign: TextAlign.center,
@@ -54,7 +140,6 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
               ),
               const SizedBox(height: 16),
 
-              // Description
               Text(
                 'Faleminderit për regjistrimin! Ekipi ynë po shqyrton informacionin tuaj dhe do t\'ju njoftojë së shpejti.',
                 textAlign: TextAlign.center,
@@ -66,7 +151,6 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
               ),
               const SizedBox(height: 32),
 
-              // Information Cards
               _buildInfoCard(
                 icon: Icons.schedule,
                 title: 'Koha e Procesimit',
@@ -87,25 +171,33 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
 
               const Spacer(),
 
-              // Back to Home Button
+              // Check Status Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                  },
+                  onPressed: _isChecking ? null : _checkRegistrationStatus,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 253, 199, 69),
                     foregroundColor: Colors.black,
+                    disabledBackgroundColor: Colors.grey.shade300,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
-                    'Kthehu në Fillim',
-                    style: GoogleFonts.nunito(fontSize: 18),
-                  ),
+                  child: _isChecking
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.black,
+                          ),
+                        )
+                      : Text(
+                          'Kontrolloni Statusin',
+                          style: GoogleFonts.nunito(fontSize: 18),
+                        ),
                 ),
               ),
             ],

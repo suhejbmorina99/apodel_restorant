@@ -1,3 +1,4 @@
+import 'package:apodel_restorant/features/orders/presentation/pages/orders.dart';
 import 'package:apodel_restorant/features/registration/presentation/widgets/processing_information.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -61,13 +62,27 @@ class _SplashScreen extends State<SplashScreen>
               final bool isRegistrationCompleted =
                   preferences.getBool('registration_completed') ?? false;
 
+              final String registrationStatus =
+                  preferences.getString('registration_status') ?? 'processing';
+
+              final bool isStatusApproved = registrationStatus == 'approved';
+
               if (lastLoginTimestamp != null) {
                 final DateTime lastLogin = DateTime.fromMillisecondsSinceEpoch(
                   lastLoginTimestamp,
                 );
                 final DateTime now = DateTime.now();
 
-                if (isRegistrationCompleted &&
+                if (isStatusApproved &&
+                    isRegistrationCompleted &&
+                    isEmailVerified &&
+                    now.difference(lastLogin).inMinutes < 30) {
+                  if (mounted) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => Orders()),
+                    );
+                  }
+                } else if (isRegistrationCompleted &&
                     isEmailVerified &&
                     now.difference(lastLogin).inMinutes < 30) {
                   if (mounted) {

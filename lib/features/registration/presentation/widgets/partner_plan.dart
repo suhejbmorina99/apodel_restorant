@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,32 +28,47 @@ class _PartnerPlanStepState extends State<PartnerPlanStep> {
     setState(() => _isLoading = true);
 
     try {
-      final userId = _supabase.auth.currentUser?.id;
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+
+      if (firebaseUser == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Sesioni ka skaduar. Ju lutem hyni sërishmi.',
+              style: GoogleFonts.nunito(),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final userId = firebaseUser.uid;
 
       final data = widget.registrationData.toJson();
       data['user_id'] = userId;
-
-      // Add delivery plan to data
       data['delivery_plan'] = _selectedDeliveryOption;
       data['pickup_enabled'] = _pickupEnabled;
-
-      // Set initial registration status to 'processing'
       data['registration_status'] = 'processing';
 
       await _supabase.from('restorants').insert(data);
 
-      // Save to SharedPreferences
+      final response = await _supabase
+          .from('restorants')
+          .select('registration_status')
+          .eq('user_id', userId)
+          .single();
+
+      final String registrationStatus =
+          response['registration_status'] as String? ?? 'processing';
+
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('registration_status', 'processing');
+      await prefs.setString('registration_status', registrationStatus);
       await prefs.setBool('registration_completed', true);
-      await prefs.setString(
-        'restaurant_id',
-        data['id'] ?? '',
-      ); // Save restaurant ID if needed
 
       if (!mounted) return;
 
-      // Navigate to Processing Information screen
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const ProcessingInformation()),
@@ -438,10 +454,7 @@ class _PartnerPlanStepState extends State<PartnerPlanStep> {
                         )
                       : Text(
                           'Përfundo Regjistrimin',
-                          style: GoogleFonts.nunito(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: GoogleFonts.nunito(fontSize: 18),
                         ),
                 ),
               ),
