@@ -80,28 +80,24 @@ class _BasicInformationStepState extends State<BasicInformationStep> {
   }
 
   Future<void> _selectTime(BuildContext context, bool isOpeningTime) async {
+    final TimeOfDay defaultTime = isOpeningTime
+        ? const TimeOfDay(hour: 8, minute: 0)
+        : const TimeOfDay(hour: 16, minute: 0);
     TimeOfDay? picked;
 
     if (Platform.isIOS) {
       // iOS: Show Cupertino Time Picker
-      DateTime initialDateTime = DateTime.now();
-      if (isOpeningTime && _openingTime != null) {
-        initialDateTime = DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-          _openingTime!.hour,
-          _openingTime!.minute,
-        );
-      } else if (!isOpeningTime && _closingTime != null) {
-        initialDateTime = DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-          _closingTime!.hour,
-          _closingTime!.minute,
-        );
-      }
+      DateTime initialDateTime = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+        isOpeningTime
+            ? (_openingTime?.hour ?? defaultTime.hour)
+            : (_closingTime?.hour ?? defaultTime.hour),
+        isOpeningTime
+            ? (_openingTime?.minute ?? defaultTime.minute)
+            : (_closingTime?.minute ?? defaultTime.minute),
+      );
 
       await showCupertinoModalPopup(
         context: context,
