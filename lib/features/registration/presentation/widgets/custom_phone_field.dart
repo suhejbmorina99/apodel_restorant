@@ -48,8 +48,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Country Code Selector
-              InkWell(
+              GestureDetector(
                 onTap: () {
                   showModalBottomSheet(
                     context: context,

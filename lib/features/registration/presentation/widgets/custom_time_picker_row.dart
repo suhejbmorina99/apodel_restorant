@@ -42,7 +42,7 @@ class CustomTimePickerRow extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        InkWell(
+        GestureDetector(
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
