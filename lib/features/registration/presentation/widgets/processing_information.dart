@@ -1,3 +1,4 @@
+import 'package:apodel_restorant/features/splash/presentation/pages/splash_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,9 +54,12 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
 
       if (!mounted) return;
 
-      if (status == 'rejected') {
+      if (status == 'approved') {
         // Show rejection dialog
-        _showRejectionDialog();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SplashScreen()),
+        );
       }
       // If still 'processing', do nothing, stay on this screen
     } catch (e) {
@@ -69,46 +73,6 @@ class _ProcessingInformationState extends State<ProcessingInformation> {
     } finally {
       if (mounted) setState(() => _isChecking = false);
     }
-  }
-
-  void _showRejectionDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Regjistrimi u Refuzua',
-          style: GoogleFonts.nunito(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-        ),
-        content: Text(
-          'Regjistrimi juaj u refuzuar nga ekipi ynë. Ju mund t\'a mundoni mal herë ose t\'i kontaktoni mbështetjen tonë.',
-          style: GoogleFonts.nunito(color: Colors.grey.shade600),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.popUntil(context, (route) => route.isFirst);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 253, 199, 69),
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Text(
-              'Mirëkuptim',
-              style: GoogleFonts.nunito(fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
