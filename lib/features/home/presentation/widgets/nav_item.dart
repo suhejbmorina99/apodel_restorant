@@ -35,7 +35,7 @@ class NavItem extends StatelessWidget {
             Icon(
               icon,
               color: isSelected
-                  ? Colors.black
+                  ? Theme.of(context).colorScheme.onPrimary
                   : Theme.of(context).colorScheme.secondary,
               size: 24,
             ),
@@ -46,7 +46,7 @@ class NavItem extends StatelessWidget {
                 style: GoogleFonts.nunito(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
             ],
