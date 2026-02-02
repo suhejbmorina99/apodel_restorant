@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/login.dart';
 import 'package:apodel_restorant/features/registration/presentation/pages/business_registration.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/email_verification.dart';
-import 'package:apodel_restorant/features/orders/presentation/pages/orders.dart';
+import 'package:apodel_restorant/features/home/presentation/pages/home_page.dart';
 import 'package:apodel_restorant/features/registration/presentation/widgets/processing_information.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -112,7 +112,7 @@ class _SplashScreen extends State<SplashScreen>
                     if (mounted) {
                       if (status == 'approved') {
                         Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) => Orders()),
+                          MaterialPageRoute(builder: (context) => HomePage()),
                         );
                       } else {
                         Navigator.of(context).pushReplacement(
@@ -132,7 +132,7 @@ class _SplashScreen extends State<SplashScreen>
                   if (mounted) {
                     if (registrationStatus == 'approved') {
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => Orders()),
+                        MaterialPageRoute(builder: (context) => HomePage()),
                       );
                     } else {
                       Navigator.of(context).pushReplacement(
