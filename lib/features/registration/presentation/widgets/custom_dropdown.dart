@@ -19,8 +19,74 @@ class CustomDropdown extends StatelessWidget {
     this.validator,
   });
 
+  void _showBottomModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.nunito(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      final isSelected = item == value;
+
+                      return ListTile(
+                        title: Text(
+                          item,
+                          style: GoogleFonts.nunito(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
+                        trailing: isSelected
+                            ? const Icon(
+                                Icons.check_circle,
+                                color: Color.fromARGB(255, 253, 199, 69),
+                              )
+                            : null,
+                        onTap: () {
+                          onChanged(item);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Check if there's a validation error
+    final hasError = validator != null && validator!(value) != null;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,66 +102,57 @@ class CustomDropdown extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        SizedBox(
-          width: MediaQuery.of(context).size.width - 50,
-          child: DropdownButtonFormField<String>(
-            value: value,
-            decoration: InputDecoration(
-              filled: true,
-              hintText: hint,
-              hintStyle: GoogleFonts.nunito(
-                color: Theme.of(context).colorScheme.secondary,
-                fontWeight: FontWeight.normal,
-                fontSize: 14,
-              ),
-              fillColor: Theme.of(context).colorScheme.primaryContainer,
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  width: 2,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(
-                  color: Color.fromARGB(255, 253, 199, 69),
-                  width: 2,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Colors.red, width: 2),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Colors.red, width: 2),
+        GestureDetector(
+          onTap: () => _showBottomModal(context),
+          child: Container(
+            width: MediaQuery.of(context).size.width - 50,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: hasError
+                    ? Colors.red
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                width: 2,
               ),
             ),
-            style: GoogleFonts.nunito(
-              color: Theme.of(context).colorScheme.onPrimary,
-              fontSize: 14,
-            ),
-            dropdownColor: Theme.of(context).colorScheme.primaryContainer,
-            items: items.map((String item) {
-              return DropdownMenuItem<String>(
-                value: item,
-                child: Text(
-                  item,
-                  style: GoogleFonts.nunito(
-                    color: Theme.of(context).colorScheme.onPrimary,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    value ?? hint,
+                    style: GoogleFonts.nunito(
+                      color: value != null
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.secondary,
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              );
-            }).toList(),
-            onChanged: onChanged,
-            validator: validator,
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ],
+            ),
           ),
         ),
+        if (hasError)
+          Padding(
+            padding: const EdgeInsets.only(left: 12, top: 4),
+            child: Text(
+              validator!(value)!,
+              style: GoogleFonts.nunito(
+                fontSize: 12,
+                color: Colors.red,
+                height: 0.5,
+              ),
+              maxLines: 1,
+            ),
+          ),
       ],
     );
   }
