@@ -156,180 +156,195 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         title: Text(
           'Shto Produkt të Ri',
           style: GoogleFonts.nunito(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: Theme.of(context).colorScheme.onPrimary,
+            textStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary,
+              fontSize: 18,
+            ),
           ),
         ),
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 16),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        // Image Picker
-                        GestureDetector(
-                          onTap: _pickImage,
-                          child: Container(
-                            width: MediaQuery.of(context).size.width - 50,
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
+          child: Center(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          // Image Picker
+                          GestureDetector(
+                            onTap: _pickImage,
+                            child: Container(
+                              width: MediaQuery.of(context).size.width - 50,
+                              height: 200,
+                              decoration: BoxDecoration(
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSurfaceVariant,
-                                width: 2,
+                                ).colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                  width: 2,
+                                ),
                               ),
-                            ),
-                            child: _imageFile != null
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.file(
-                                      _imageFile!,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
-                                : Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.add_photo_alternate,
-                                        size: 48,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.secondary,
+                              child: _imageFile != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.file(
+                                        _imageFile!,
+                                        fit: BoxFit.cover,
                                       ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Shto Foto',
-                                        style: GoogleFonts.nunito(
-                                          fontSize: 16,
+                                    )
+                                  : Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add_photo_alternate,
+                                          size: 48,
                                           color: Theme.of(
                                             context,
                                           ).colorScheme.secondary,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        CustomTextField(
-                          label: 'Emri i produktit',
-                          hint: 'p.sh. Pica Margherita',
-                          controller: _nameController,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Ju lutem shkruani emrin';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 12),
-
-                        CustomDropdown(
-                          label: 'Kategoria',
-                          hint: 'Zgjidhni kategorinë',
-                          value: _selectedCategory,
-                          items: _categories,
-                          onChanged: (value) {
-                            setState(() => _selectedCategory = value);
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Ju lutem zgjidhni kategorinë';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 12),
-
-                        CustomTextField(
-                          label: 'Çmimi (€)',
-                          hint: '0.00',
-                          controller: _priceController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d+\.?\d{0,2}'),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Shto Foto',
+                                          style: GoogleFonts.nunito(
+                                            fontSize: 16,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.secondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                             ),
-                          ],
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Ju lutem shkruani çmimin';
-                            }
-                            final price = double.tryParse(value);
-                            if (price == null || price <= 0) {
-                              return 'Çmimi duhet të jetë më i madh se 0';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 12),
+                          ),
+                          const SizedBox(height: 20),
 
-                        CustomTextField(
-                          label: 'Përshkrimi (opsionale)',
-                          hint: 'Përshkrimi i produktit',
-                          controller: _descriptionController,
-                          maxLines: 3,
-                        ),
-                      ],
+                          CustomTextField(
+                            label: 'Emri i produktit',
+                            hint: 'p.sh. Pica Margarita',
+                            controller: _nameController,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Ju lutem shkruani emrin';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+
+                          CustomDropdown(
+                            label: 'Kategoria',
+                            hint: 'Zgjidhni kategorinë',
+                            value: _selectedCategory,
+                            items: _categories,
+                            onChanged: (value) {
+                              setState(() => _selectedCategory = value);
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Ju lutem zgjidhni kategorinë';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+
+                          CustomTextField(
+                            label: 'Çmimi (€)',
+                            hint: '0.00',
+                            controller: _priceController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d+\.?\d{0,2}'),
+                              ),
+                            ],
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Ju lutem shkruani çmimin';
+                              }
+                              final price = double.tryParse(value);
+                              if (price == null || price <= 0) {
+                                return 'Çmimi duhet të jetë më i madh se 0';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 12),
+
+                          CustomTextField(
+                            label: 'Përshkrimi (opsionale)',
+                            hint: 'Përshkrimi i produktit',
+                            controller: _descriptionController,
+                            maxLines: 3,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: MediaQuery.of(context).size.width - 50,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _saveMenuItem,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 253, 199, 69),
-                    foregroundColor: Colors.black,
-                    disabledBackgroundColor: Colors.grey.shade300,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 50,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        FocusScope.of(context).unfocus();
+                        if (!_isLoading) _saveMenuItem();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: const Color.fromARGB(255, 33, 33, 33),
+                        backgroundColor: const Color.fromARGB(
+                          255,
+                          253,
+                          199,
+                          69,
+                        ),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.black,
+                              ),
+                            )
+                          : Text(
+                              'Ruaj Produktin',
+                              style: GoogleFonts.nunito(
+                                fontSize: 18,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.black,
-                          ),
-                        )
-                      : Text(
-                          'Ruaj Produktin',
-                          style: GoogleFonts.nunito(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                ),
+                  const SizedBox(height: 16),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
