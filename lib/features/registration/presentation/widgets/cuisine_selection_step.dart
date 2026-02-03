@@ -14,8 +14,8 @@ class CuisineSelectionStep extends StatefulWidget {
 }
 
 class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
-  String? _selectedCuisine;
   bool _showValidationError = false;
+  List<String> _selectedCuisines = [];
 
   final List<String> _cuisines = [
     'Shqiptare',
@@ -48,17 +48,46 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
   @override
   void initState() {
     super.initState();
-    _selectedCuisine = widget.registrationData.kuzhina;
+    // Load previously selected cuisines if any (stored as comma-separated string)
+    if (widget.registrationData.kuzhina != null &&
+        widget.registrationData.kuzhina!.isNotEmpty) {
+      _selectedCuisines = widget.registrationData.kuzhina!.split(',');
+    }
+  }
+
+  void _toggleCuisine(String cuisine) {
+    setState(() {
+      if (_selectedCuisines.contains(cuisine)) {
+        _selectedCuisines.remove(cuisine);
+      } else {
+        if (_selectedCuisines.length < 5) {
+          _selectedCuisines.add(cuisine);
+          _showValidationError = false;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Mund të zgjidhni maksimumi 5 lloje kuzhinash',
+                style: GoogleFonts.nunito(),
+              ),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    });
   }
 
   void _continueToPartnerPlan() {
-    if (_selectedCuisine == null) {
+    if (_selectedCuisines.isEmpty) {
       HapticFeedback.lightImpact();
       setState(() => _showValidationError = true);
       return;
     }
 
-    widget.registrationData.kuzhina = _selectedCuisine;
+    // Store as comma-separated string
+    widget.registrationData.kuzhina = _selectedCuisines.join(',');
 
     Navigator.push(
       context,
@@ -82,15 +111,12 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
       ),
       itemBuilder: (context, index) {
         final cuisine = _cuisines[index];
-        final isSelected = _selectedCuisine == cuisine;
+        final isSelected = _selectedCuisines.contains(cuisine);
 
         return GestureDetector(
           onTap: () {
             HapticFeedback.selectionClick();
-            setState(() {
-              _selectedCuisine = cuisine;
-              _showValidationError = false;
-            });
+            _toggleCuisine(cuisine);
           },
           child: AnimatedScale(
             scale: isSelected ? 1.05 : 1.0,
@@ -178,13 +204,21 @@ class _CuisineSelectionStepState extends State<CuisineSelectionStep> {
                     vertical: 16,
                   ),
                   children: [
+                    Text(
+                      'Zgjidhni deri në 5 lloje kuzhinash',
+                      style: GoogleFonts.nunito(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
                     _buildCuisineGrid(),
 
-                    if (_showValidationError && _selectedCuisine == null)
+                    if (_showValidationError && _selectedCuisines.isEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
                         child: Text(
-                          'Ju lutem zgjidhni llojin e kuzhinës',
+                          'Ju lutem zgjidhni të paktën një lloj kuzhinë',
                           style: GoogleFonts.nunito(
                             color: Colors.red,
                             fontSize: 13,
