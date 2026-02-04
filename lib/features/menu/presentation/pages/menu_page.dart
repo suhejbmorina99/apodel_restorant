@@ -184,6 +184,7 @@ class _MenuPageState extends State<MenuPage> {
         }
       },
       child: Card(
+        color: Theme.of(context).colorScheme.primaryContainer,
         margin: const EdgeInsets.only(bottom: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: ListTile(
@@ -212,6 +213,7 @@ class _MenuPageState extends State<MenuPage> {
             style: GoogleFonts.nunito(
               fontWeight: FontWeight.w600,
               fontSize: 16,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
           subtitle: Column(
@@ -222,7 +224,7 @@ class _MenuPageState extends State<MenuPage> {
                 item.category,
                 style: GoogleFonts.nunito(
                   fontSize: 12,
-                  color: Colors.grey.shade600,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
               if (item.description != null) ...[
@@ -231,7 +233,10 @@ class _MenuPageState extends State<MenuPage> {
                   item.description!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.nunito(fontSize: 13),
+                  style: GoogleFonts.nunito(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ),
               ],
             ],
