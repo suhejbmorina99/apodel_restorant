@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -102,8 +103,39 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
     }
   }
 
+  Future<bool> _verifyRestaurantOwnership() async {
+    try {
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser == null) return false;
+
+      final response = await _supabase
+          .from('restorants')
+          .select('user_id')
+          .eq('id', widget.restaurantId)
+          .single();
+
+      return response['user_id'] == firebaseUser.uid;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> _saveMenuItem() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final isOwner = await _verifyRestaurantOwnership();
+    if (!isOwner) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Ju nuk keni leje për këtë operacion',
+            style: GoogleFonts.nunito(),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
