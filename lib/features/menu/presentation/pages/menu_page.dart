@@ -168,62 +168,87 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Widget _buildMenuItem(MenuItem item) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: item.imageUrl != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  item.imageUrl!,
+    return GestureDetector(
+      onTap: () async {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AddMenuItemPage(
+              restaurantId: _restaurantId!,
+              existingItem: item, // Pass the item to edit
+            ),
+          ),
+        );
+        if (result == true) {
+          _loadMenuItems();
+        }
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(12),
+          leading: item.imageUrl != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    item.imageUrl!,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : Container(
                   width: 60,
                   height: 60,
-                  fit: BoxFit.cover,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.fastfood, color: Colors.grey.shade400),
                 ),
-              )
-            : Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(Icons.fastfood, color: Colors.grey.shade400),
-              ),
-        title: Text(
-          item.name,
-          style: GoogleFonts.nunito(fontWeight: FontWeight.w600, fontSize: 16),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              item.category,
-              style: GoogleFonts.nunito(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-              ),
+          title: Text(
+            item.name,
+            style: GoogleFonts.nunito(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
             ),
-            if (item.description != null) ...[
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               const SizedBox(height: 4),
               Text(
-                item.description!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.nunito(fontSize: 13),
+                item.category,
+                style: GoogleFonts.nunito(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              if (item.description != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  item.description!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.nunito(fontSize: 13),
+                ),
+              ],
+            ],
+          ),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '€${item.price.toStringAsFixed(2)}',
+                style: GoogleFonts.nunito(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(255, 253, 199, 69),
+                ),
               ),
             ],
-          ],
-        ),
-        trailing: Text(
-          '€${item.price.toStringAsFixed(2)}',
-          style: GoogleFonts.nunito(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: const Color.fromARGB(255, 253, 199, 69),
           ),
         ),
       ),

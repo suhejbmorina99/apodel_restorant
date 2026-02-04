@@ -11,8 +11,13 @@ import 'package:apodel_restorant/features/registration/presentation/widgets/cust
 
 class AddMenuItemPage extends StatefulWidget {
   final String restaurantId;
+  final MenuItem? existingItem; // Add this
 
-  const AddMenuItemPage({super.key, required this.restaurantId});
+  const AddMenuItemPage({
+    super.key,
+    required this.restaurantId,
+    this.existingItem, // Add this
+  });
 
   @override
   State<AddMenuItemPage> createState() => _AddMenuItemPageState();
@@ -28,6 +33,7 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
 
   String? _selectedCategory;
   File? _imageFile;
+  String? _existingImageUrl;
   bool _isLoading = false;
 
   final List<String> _categories = [
@@ -41,6 +47,21 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
     'Pasta',
     'Tjetër',
   ];
+
+  bool get isEditMode => widget.existingItem != null;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill fields if editing
+    if (widget.existingItem != null) {
+      _nameController.text = widget.existingItem!.name;
+      _descriptionController.text = widget.existingItem!.description ?? '';
+      _priceController.text = widget.existingItem!.price.toString();
+      _selectedCategory = widget.existingItem!.category;
+      _existingImageUrl = widget.existingItem!.imageUrl;
+    }
+  }
 
   @override
   void dispose() {
@@ -62,12 +83,14 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
     if (image != null) {
       setState(() {
         _imageFile = File(image.path);
+        _existingImageUrl = null; // Clear existing image when new one is picked
       });
     }
   }
 
   Future<String?> _uploadImage() async {
-    if (_imageFile == null) return null;
+    if (_imageFile == null)
+      return _existingImageUrl; // Keep existing image if no new one
 
     try {
       final fileName =
@@ -123,6 +146,19 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
   Future<void> _saveMenuItem() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (_selectedCategory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Ju lutem zgjidhni kategorinë',
+            style: GoogleFonts.nunito(),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final isOwner = await _verifyRestaurantOwnership();
     if (!isOwner) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -140,11 +176,12 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
     setState(() => _isLoading = true);
 
     try {
-      // Upload image first
+      // Upload image (or keep existing)
       final imageUrl = await _uploadImage();
 
-      // Create menu item
+      // Create or update menu item
       final menuItem = MenuItem(
+        id: widget.existingItem?.id, // Include ID if editing
         restaurantId: widget.restaurantId,
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim().isNotEmpty
@@ -155,14 +192,25 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
         category: _selectedCategory!,
       );
 
-      await _supabase.from('menu_items').insert(menuItem.toJson());
+      if (isEditMode) {
+        // Update existing item
+        await _supabase
+            .from('menu_items')
+            .update(menuItem.toJson())
+            .eq('id', widget.existingItem!.id!);
+      } else {
+        // Insert new item
+        await _supabase.from('menu_items').insert(menuItem.toJson());
+      }
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Produkti u shtua me sukses!',
+            isEditMode
+                ? 'Produkti u përditësua me sukses!'
+                : 'Produkti u shtua me sukses!',
             style: GoogleFonts.nunito(),
           ),
           backgroundColor: Colors.green,
@@ -184,6 +232,81 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
     }
   }
 
+  Future<void> _deleteMenuItem() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Fshi Produktin',
+          style: GoogleFonts.nunito(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
+        content: Text(
+          'A jeni të sigurt që dëshironi të fshini "${_nameController.text}"?',
+          style: GoogleFonts.nunito(
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Anulo',
+              style: GoogleFonts.nunito(color: Colors.grey.shade600),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Fshi', style: GoogleFonts.nunito()),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await _supabase
+            .from('menu_items')
+            .delete()
+            .eq('id', widget.existingItem!.id!);
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Produkti u fshi me sukses!',
+              style: GoogleFonts.nunito(),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        Navigator.pop(context, true);
+      } catch (e) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Gabim: ${e.toString()}',
+              style: GoogleFonts.nunito(),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,7 +316,7 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         title: Text(
-          'Shto Produkt të Ri',
+          isEditMode ? 'Ndrysho Produktin' : 'Shto Produkt të Ri',
           style: GoogleFonts.nunito(
             textStyle: TextStyle(
               color: Theme.of(context).colorScheme.onPrimary,
@@ -237,6 +360,14 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                                       borderRadius: BorderRadius.circular(12),
                                       child: Image.file(
                                         _imageFile!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : _existingImageUrl != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.network(
+                                        _existingImageUrl!,
                                         fit: BoxFit.cover,
                                       ),
                                     )
@@ -333,6 +464,8 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
+                  // Save/Update Button
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 50,
                     height: 50,
@@ -365,7 +498,7 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                               ),
                             )
                           : Text(
-                              'Ruaj Produktin',
+                              isEditMode ? 'Përditëso' : 'Ruaj Produktin',
                               style: GoogleFonts.nunito(
                                 fontSize: 18,
                                 color: Theme.of(context).colorScheme.onPrimary,
@@ -373,7 +506,32 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                             ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+
+                  // Delete Button (only in edit mode)
+                  if (isEditMode) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width - 50,
+                      height: 50,
+                      child: OutlinedButton(
+                        onPressed: _deleteMenuItem,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          side: const BorderSide(color: Colors.red, width: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Fshi Produktin',
+                          style: GoogleFonts.nunito(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
