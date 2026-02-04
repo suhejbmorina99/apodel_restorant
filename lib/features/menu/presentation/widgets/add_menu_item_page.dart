@@ -1,22 +1,21 @@
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:apodel_restorant/features/menu/models/menu_item.dart';
+import 'package:apodel_restorant/features/menu/services/image_service.dart';
+import 'package:apodel_restorant/features/menu/services/menu_item_service.dart';
 import 'package:apodel_restorant/features/registration/presentation/widgets/custom_text_field.dart';
 import 'package:apodel_restorant/features/registration/presentation/widgets/custom_dropdown.dart';
 
 class AddMenuItemPage extends StatefulWidget {
   final String restaurantId;
-  final MenuItem? existingItem; // Add this
+  final MenuItem? existingItem;
 
   const AddMenuItemPage({
     super.key,
     required this.restaurantId,
-    this.existingItem, // Add this
+    this.existingItem,
   });
 
   @override
@@ -25,7 +24,8 @@ class AddMenuItemPage extends StatefulWidget {
 
 class _AddMenuItemPageState extends State<AddMenuItemPage> {
   final _formKey = GlobalKey<FormState>();
-  final _supabase = Supabase.instance.client;
+  final _imageService = ImageService();
+  final _menuItemService = MenuItemService();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -53,7 +53,6 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
   @override
   void initState() {
     super.initState();
-    // Pre-fill fields if editing
     if (widget.existingItem != null) {
       _nameController.text = widget.existingItem!.name;
       _descriptionController.text = widget.existingItem!.description ?? '';
@@ -72,74 +71,12 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
   }
 
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1024,
-      maxHeight: 1024,
-      imageQuality: 85,
-    );
-
+    final image = await _imageService.pickImage();
     if (image != null) {
       setState(() {
-        _imageFile = File(image.path);
-        _existingImageUrl = null; // Clear existing image when new one is picked
+        _imageFile = image;
+        _existingImageUrl = null;
       });
-    }
-  }
-
-  Future<String?> _uploadImage() async {
-    if (_imageFile == null)
-      return _existingImageUrl; // Keep existing image if no new one
-
-    try {
-      final fileName =
-          '${widget.restaurantId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final filePath = '${widget.restaurantId}/$fileName';
-
-      await _supabase.storage
-          .from('menu-images')
-          .upload(
-            filePath,
-            _imageFile!,
-            fileOptions: const FileOptions(upsert: true),
-          );
-
-      final imageUrl = _supabase.storage
-          .from('menu-images')
-          .getPublicUrl(filePath);
-
-      return imageUrl;
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Gabim në ngarkimin e fotos: $e',
-              style: GoogleFonts.nunito(),
-            ),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      return null;
-    }
-  }
-
-  Future<bool> _verifyRestaurantOwnership() async {
-    try {
-      final firebaseUser = FirebaseAuth.instance.currentUser;
-      if (firebaseUser == null) return false;
-
-      final response = await _supabase
-          .from('restorants')
-          .select('user_id')
-          .eq('id', widget.restaurantId)
-          .single();
-
-      return response['user_id'] == firebaseUser.uid;
-    } catch (e) {
-      return false;
     }
   }
 
@@ -159,29 +96,38 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
       return;
     }
 
-    final isOwner = await _verifyRestaurantOwnership();
+    final isOwner = await _menuItemService.verifyRestaurantOwnership(
+      widget.restaurantId,
+    );
     if (!isOwner) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Ju nuk keni leje për këtë operacion',
-            style: GoogleFonts.nunito(),
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Ju nuk keni leje për këtë operacion',
+              style: GoogleFonts.nunito(),
+            ),
+            backgroundColor: Colors.red,
           ),
-          backgroundColor: Colors.red,
-        ),
-      );
+        );
+      }
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      // Upload image (or keep existing)
-      final imageUrl = await _uploadImage();
+      // Upload image
+      final imageUrl = await _imageService.uploadImage(
+        restaurantId: widget.restaurantId,
+        imageFile: _imageFile,
+        existingImageUrl: _existingImageUrl,
+        context: context,
+      );
 
-      // Create or update menu item
+      // Create menu item
       final menuItem = MenuItem(
-        id: widget.existingItem?.id, // Include ID if editing
+        id: widget.existingItem?.id,
         restaurantId: widget.restaurantId,
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim().isNotEmpty
@@ -192,118 +138,31 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
         category: _selectedCategory!,
       );
 
-      if (isEditMode) {
-        // Update existing item
-        await _supabase
-            .from('menu_items')
-            .update(menuItem.toJson())
-            .eq('id', widget.existingItem!.id!);
-      } else {
-        // Insert new item
-        await _supabase.from('menu_items').insert(menuItem.toJson());
+      // Save to database
+      final success = await _menuItemService.saveMenuItem(
+        context: context,
+        menuItem: menuItem,
+        isEditMode: isEditMode,
+        existingItemId: widget.existingItem?.id,
+      );
+
+      if (success && mounted) {
+        Navigator.pop(context, true);
       }
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isEditMode
-                ? 'Produkti u përditësua me sukses!'
-                : 'Produkti u shtua me sukses!',
-            style: GoogleFonts.nunito(),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.pop(context, true);
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gabim: ${e.toString()}', style: GoogleFonts.nunito()),
-          backgroundColor: Colors.red,
-        ),
-      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _deleteMenuItem() async {
-    final confirmed = await showDialog<bool>(
+    final success = await _menuItemService.deleteMenuItem(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Fshi Produktin',
-          style: GoogleFonts.nunito(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-        ),
-        content: Text(
-          'A jeni të sigurt që dëshironi të fshini "${_nameController.text}"?',
-          style: GoogleFonts.nunito(
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              'Anulo',
-              style: GoogleFonts.nunito(color: Colors.grey.shade600),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: Text('Fshi', style: GoogleFonts.nunito()),
-          ),
-        ],
-      ),
+      itemId: widget.existingItem!.id!,
+      itemName: _nameController.text,
     );
 
-    if (confirmed == true) {
-      try {
-        await _supabase
-            .from('menu_items')
-            .delete()
-            .eq('id', widget.existingItem!.id!);
-
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Produkti u fshi me sukses!',
-              style: GoogleFonts.nunito(),
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        Navigator.pop(context, true);
-      } catch (e) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Gabim: ${e.toString()}',
-              style: GoogleFonts.nunito(),
-            ),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    if (success && mounted) {
+      Navigator.pop(context, true);
     }
   }
 
@@ -396,7 +255,7 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                                     ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
 
                           CustomTextField(
                             label: 'Emri i produktit',
