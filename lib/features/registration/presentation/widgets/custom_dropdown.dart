@@ -84,76 +84,81 @@ class CustomDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Check if there's a validation error
-    final hasError = validator != null && validator!(value) != null;
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.nunito(
-            textStyle: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary,
-              fontWeight: FontWeight.normal,
-              fontSize: 16,
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        GestureDetector(
-          onTap: () => _showBottomModal(context),
-          child: Container(
-            width: MediaQuery.of(context).size.width - 50,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: hasError
-                    ? Colors.red
-                    : Theme.of(context).colorScheme.onSurfaceVariant,
-                width: 2,
+    return FormField<String>(
+      initialValue: value,
+      validator: validator,
+      builder: (FormFieldState<String> field) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.nunito(
+                textStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 16,
+                ),
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    value ?? hint,
-                    style: GoogleFonts.nunito(
-                      color: value != null
-                          ? Theme.of(context).colorScheme.onPrimary
-                          : Theme.of(context).colorScheme.secondary,
-                      fontSize: 14,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () => _showBottomModal(context),
+              child: Container(
+                width: MediaQuery.of(context).size.width - 50,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: field.hasError
+                        ? Colors.red
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                    width: 2,
                   ),
                 ),
-                Icon(
-                  Icons.arrow_drop_down,
-                  color: Theme.of(context).colorScheme.secondary,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        value ?? hint,
+                        style: GoogleFonts.nunito(
+                          color: value != null
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Theme.of(context).colorScheme.secondary,
+                          fontSize: 14,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ),
-        if (hasError)
-          Padding(
-            padding: const EdgeInsets.only(left: 12, top: 4),
-            child: Text(
-              validator!(value)!,
-              style: GoogleFonts.nunito(
-                fontSize: 12,
-                color: Colors.red,
-                height: 0.5,
               ),
-              maxLines: 1,
             ),
-          ),
-      ],
+            if (field.hasError)
+              Padding(
+                padding: const EdgeInsets.only(left: 12, top: 4),
+                child: Text(
+                  field.errorText!,
+                  style: GoogleFonts.nunito(
+                    fontSize: 13,
+                    color: const Color.fromARGB(255, 190, 13, 0),
+                  ),
+                  maxLines: 1,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
