@@ -100,7 +100,9 @@ class MenuItemService {
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Anulo',
-              style: GoogleFonts.nunito(color: Colors.grey.shade600),
+              style: GoogleFonts.nunito(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
           ),
           ElevatedButton(
