@@ -1,4 +1,5 @@
 import 'package:apodel_restorant/features/menu/presentation/widgets/add_menu_item_page.dart';
+import 'package:apodel_restorant/features/menu/presentation/widgets/category_filter_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,8 +16,10 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   final _supabase = Supabase.instance.client;
   List<MenuItem> _menuItems = [];
+  List<MenuItem> _filteredMenuItems = [];
   bool _isLoading = true;
   String? _restaurantId;
+  String? _selectedCategory;
 
   @override
   void initState() {
@@ -31,7 +34,6 @@ class _MenuPageState extends State<MenuPage> {
       final firebaseUser = FirebaseAuth.instance.currentUser;
       if (firebaseUser == null) return;
 
-      // Get restaurant ID
       final restaurantResponse = await _supabase
           .from('restorants')
           .select('id')
@@ -40,7 +42,6 @@ class _MenuPageState extends State<MenuPage> {
 
       _restaurantId = restaurantResponse['id'] as String;
 
-      // Load menu items
       await _loadMenuItems();
     } catch (e) {
       if (mounted) {
@@ -73,6 +74,7 @@ class _MenuPageState extends State<MenuPage> {
         _menuItems = (response as List)
             .map((item) => MenuItem.fromJson(item))
             .toList();
+        _filterMenuItems();
       });
     } catch (e) {
       if (mounted) {
@@ -86,6 +88,16 @@ class _MenuPageState extends State<MenuPage> {
           ),
         );
       }
+    }
+  }
+
+  void _filterMenuItems() {
+    if (_selectedCategory == null) {
+      _filteredMenuItems = _menuItems;
+    } else {
+      _filteredMenuItems = _menuItems
+          .where((item) => item.category == _selectedCategory)
+          .toList();
     }
   }
 
@@ -103,10 +115,32 @@ class _MenuPageState extends State<MenuPage> {
             color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              CategoryFilterSheet.show(
+                context,
+                selectedCategory: _selectedCategory,
+                onCategorySelected: (category) {
+                  setState(() {
+                    _selectedCategory = category;
+                    _filterMenuItems();
+                  });
+                },
+              );
+            },
+            icon: Icon(
+              Icons.filter_list,
+              color: _selectedCategory != null
+                  ? const Color.fromARGB(255, 253, 199, 69)
+                  : Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _menuItems.isEmpty
+          : _filteredMenuItems.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -118,7 +152,9 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Asnjë produkt ende',
+                    _selectedCategory != null
+                        ? 'Asnjë produkt në "$_selectedCategory"'
+                        : 'Asnjë produkt ende',
                     style: GoogleFonts.nunito(
                       fontSize: 18,
                       color: Colors.grey.shade600,
@@ -126,7 +162,9 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Shtoni produktin tuaj të parë',
+                    _selectedCategory != null
+                        ? 'Provo një kategori tjetër'
+                        : 'Shtoni produktin tuaj të parë',
                     style: GoogleFonts.nunito(
                       fontSize: 14,
                       color: Colors.grey.shade500,
@@ -137,9 +175,9 @@ class _MenuPageState extends State<MenuPage> {
             )
           : ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: _menuItems.length,
+              itemCount: _filteredMenuItems.length,
               itemBuilder: (context, index) {
-                final item = _menuItems[index];
+                final item = _filteredMenuItems[index];
                 return _buildMenuItem(item);
               },
             ),
@@ -191,7 +229,6 @@ class _MenuPageState extends State<MenuPage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Image
               item.imageUrl != null
                   ? ClipRRect(
                       borderRadius: const BorderRadius.only(
@@ -215,8 +252,6 @@ class _MenuPageState extends State<MenuPage> {
                       ),
                       child: Icon(Icons.fastfood, color: Colors.grey.shade400),
                     ),
-
-              // Content (name, category, description)
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
@@ -256,8 +291,6 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                 ),
               ),
-
-              // Price - centered vertically
               Center(
                 child: Padding(
                   padding: const EdgeInsets.only(right: 12),
