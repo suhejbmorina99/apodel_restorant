@@ -175,7 +175,7 @@ class _MenuPageState extends State<MenuPage> {
           MaterialPageRoute(
             builder: (context) => AddMenuItemPage(
               restaurantId: _restaurantId!,
-              existingItem: item, // Pass the item to edit
+              existingItem: item,
             ),
           ),
         );
@@ -187,70 +187,88 @@ class _MenuPageState extends State<MenuPage> {
         color: Theme.of(context).colorScheme.primaryContainer,
         margin: const EdgeInsets.only(bottom: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(12),
-          leading: item.imageUrl != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    item.imageUrl!,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              : Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(Icons.fastfood, color: Colors.grey.shade400),
-                ),
-          title: Text(
-            item.name,
-            style: GoogleFonts.nunito(
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 4),
-              Text(
-                item.category,
-                style: GoogleFonts.nunito(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.onPrimary,
+              // Image
+              item.imageUrl != null
+                  ? ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
+                      ),
+                      child: Image.network(
+                        item.imageUrl!,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Container(
+                      width: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
+                        ),
+                      ),
+                      child: Icon(Icons.fastfood, color: Colors.grey.shade400),
+                    ),
+
+              // Content (name, category, description)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        item.name,
+                        style: GoogleFonts.nunito(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        item.category,
+                        style: GoogleFonts.nunito(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      ),
+                      if (item.description != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          item.description!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.nunito(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
-              if (item.description != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  item.description!,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.nunito(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.onPrimary,
+
+              // Price - centered vertically
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Text(
+                    '€${item.price.toStringAsFixed(2)}',
+                    style: GoogleFonts.nunito(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: const Color.fromARGB(255, 253, 199, 69),
+                    ),
                   ),
-                ),
-              ],
-            ],
-          ),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '€${item.price.toStringAsFixed(2)}',
-                style: GoogleFonts.nunito(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 253, 199, 69),
                 ),
               ),
             ],
