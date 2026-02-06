@@ -111,7 +111,7 @@ class _MenuPageState extends State<MenuPage> {
         title: Text(
           'Menuja',
           style: GoogleFonts.nunito(
-            fontSize: 20,
+            fontSize: 18,
             color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
