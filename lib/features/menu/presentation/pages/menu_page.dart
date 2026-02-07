@@ -138,49 +138,54 @@ class _MenuPageState extends State<MenuPage> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _filteredMenuItems.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.restaurant_menu,
-                    size: 80,
-                    color: Colors.grey.shade400,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 16),
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _filteredMenuItems.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.restaurant_menu,
+                        size: 80,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _selectedCategory != null
+                            ? 'Asnjë produkt në "$_selectedCategory"'
+                            : 'Asnjë produkt ende',
+                        style: GoogleFonts.nunito(
+                          fontSize: 18,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _selectedCategory != null
+                            ? 'Provo një kategori tjetër'
+                            : 'Shtoni produktin tuaj të parë',
+                        style: GoogleFonts.nunito(
+                          fontSize: 14,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _selectedCategory != null
-                        ? 'Asnjë produkt në "$_selectedCategory"'
-                        : 'Asnjë produkt ende',
-                    style: GoogleFonts.nunito(
-                      fontSize: 18,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _selectedCategory != null
-                        ? 'Provo një kategori tjetër'
-                        : 'Shtoni produktin tuaj të parë',
-                    style: GoogleFonts.nunito(
-                      fontSize: 14,
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _filteredMenuItems.length,
-              itemBuilder: (context, index) {
-                final item = _filteredMenuItems[index];
-                return _buildMenuItem(item);
-              },
-            ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: _filteredMenuItems.length,
+                  itemBuilder: (context, index) {
+                    final item = _filteredMenuItems[index];
+                    return _buildMenuItem(item);
+                  },
+                ),
+        ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final result = await Navigator.push(
