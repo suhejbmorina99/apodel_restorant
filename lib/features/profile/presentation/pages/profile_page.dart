@@ -56,6 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: GoogleFonts.nunito(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onPrimary,
+                    fontSize: 18,
                   ),
                 ),
                 content: Text(
@@ -111,6 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: GoogleFonts.nunito(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onPrimary,
+                    fontSize: 18,
                   ),
                 ),
                 content: Text(

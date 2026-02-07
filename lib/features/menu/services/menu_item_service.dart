@@ -87,6 +87,7 @@ class MenuItemService {
           style: GoogleFonts.nunito(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.onPrimary,
+            fontSize: 18,
           ),
         ),
         content: Text(

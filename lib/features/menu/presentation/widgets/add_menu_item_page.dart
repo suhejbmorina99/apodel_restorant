@@ -383,10 +383,7 @@ class _AddMenuItemPageState extends State<AddMenuItemPage> {
                         ),
                         child: Text(
                           'Fshi Produktin',
-                          style: GoogleFonts.nunito(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: GoogleFonts.nunito(fontSize: 18),
                         ),
                       ),
                     ),
