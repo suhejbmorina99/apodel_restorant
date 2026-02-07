@@ -25,14 +25,14 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final items = [
       {
-        'emoji': '📊',
+        'icon': Icons.bar_chart,
         'title': 'Raportet',
         'onTap': () => Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (ctx) => const ReportsPage())),
       },
       // {
-      //   'emoji': '🎬',
+      //   'icon': Icons.videocam,
       //   'title': 'Visual Mode',
       //   'onTap': () => Navigator.push(
       //     context,
@@ -40,11 +40,10 @@ class _ProfilePageState extends State<ProfilePage> {
       //   ),
       // },
       {
-        'emoji': '👋',
+        'icon': Icons.logout,
         'title': 'Logout',
         'onTap': () async {
           HapticFeedback.lightImpact();
-          // Show confirmation dialog
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -124,11 +123,10 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       },
       {
-        'emoji': '❌',
+        'icon': Icons.delete_forever,
         'title': 'Delete Account',
         'onTap': () async {
           HapticFeedback.lightImpact();
-          // Show confirmation dialog
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -256,14 +254,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: ListTile(
-                              leading: Text(
-                                item['emoji'] as String,
-                                style: GoogleFonts.nunito(
-                                  fontSize: 24,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimary,
-                                ),
+                              leading: Icon(
+                                item['icon'] as IconData,
+                                size: 24,
+                                color: Theme.of(context).colorScheme.onPrimary,
                               ),
                               title: Text(
                                 item['title'] as String,
@@ -273,6 +267,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                     context,
                                   ).colorScheme.onPrimary,
                                 ),
+                              ),
+                              trailing: Icon(
+                                Icons.chevron_right,
+                                color: Theme.of(context).colorScheme.secondary,
                               ),
                               onTap: item['onTap'] as void Function()?,
                             ),
