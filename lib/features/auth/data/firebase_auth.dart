@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:apodel_restorant/features/auth/data/supabase_auth.dart';
 import 'package:apodel_restorant/features/splash/presentation/pages/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:apodel_restorant/features/auth/presentation/pages/login.dart';
@@ -14,6 +15,8 @@ import 'package:apodel_restorant/features/auth/presentation/pages/email_verifica
 import 'package:apodel_restorant/core/network/email_service.dart';
 
 class AuthService {
+  final _supabaseAuthService = SupabaseAuthService();
+
   User? getCurrentUser() {
     return FirebaseAuth.instance.currentUser;
   }
@@ -368,10 +371,7 @@ class AuthService {
           String providerId = user.providerData[0].providerId;
 
           if (providerId == 'password') {
-            // Email/Password Sign-In
-            String? password = await showPasswordPrompt(
-              context,
-            ); // Prompt for password
+            String? password = await showPasswordPrompt(context);
             if (password == null || password.isEmpty) {
               Fluttertoast.showToast(
                 msg: 'Password is required to delete the account.',
@@ -388,11 +388,8 @@ class AuthService {
               email: user.email!,
               password: password,
             );
-            await user.reauthenticateWithCredential(
-              credential,
-            ); // Re-authenticate
+            await user.reauthenticateWithCredential(credential);
           } else if (providerId == 'google.com') {
-            // Google Sign-In
             final GoogleSignInAccount? googleUser = await GoogleSignIn()
                 .signIn();
             if (googleUser == null) {
@@ -414,11 +411,8 @@ class AuthService {
               accessToken: googleAuth.accessToken,
               idToken: googleAuth.idToken,
             );
-            await user.reauthenticateWithCredential(
-              credential,
-            ); // Re-authenticate
+            await user.reauthenticateWithCredential(credential);
           } else if (providerId == 'apple.com') {
-            // Apple Sign-In
             final appleCredential = await SignInWithApple.getAppleIDCredential(
               scopes: [
                 AppleIDAuthorizationScopes.email,
@@ -430,9 +424,7 @@ class AuthService {
               idToken: appleCredential.identityToken,
               accessToken: appleCredential.authorizationCode,
             );
-            await user.reauthenticateWithCredential(
-              credential,
-            ); // Re-authenticate
+            await user.reauthenticateWithCredential(credential);
           } else {
             Fluttertoast.showToast(
               msg: 'Unsupported sign-in provider. Cannot delete account.',
@@ -446,7 +438,23 @@ class AuthService {
           }
         }
 
-        // Step 2: Delete the user account
+        // Step 2: Delete Supabase data (restaurant + menu items CASCADE)
+        final supabaseDeleted = await _supabaseAuthService.deleteUserData(
+          user.uid,
+        );
+        if (!supabaseDeleted) {
+          Fluttertoast.showToast(
+            msg: 'Failed to delete restaurant data. Please try again.',
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.SNACKBAR,
+            backgroundColor: Colors.black54,
+            textColor: Colors.white,
+            fontSize: 14.0,
+          );
+          return false;
+        }
+
+        // Step 3: Delete the Firebase user account
         await user.delete();
 
         Fluttertoast.showToast(
@@ -458,13 +466,13 @@ class AuthService {
           fontSize: 14.0,
         );
 
-        // Step 3: Sign out the user
+        // Step 4: Sign out and navigate
         await FirebaseAuth.instance.signOut();
 
-        // Navigate to the login screen
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (BuildContext context) => LoginScreen()),
+          (route) => false,
         );
 
         return true;
