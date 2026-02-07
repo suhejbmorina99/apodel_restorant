@@ -1,6 +1,5 @@
 import 'package:apodel_restorant/features/auth/data/firebase_auth.dart';
 import 'package:apodel_restorant/features/reports/presentation/pages/reports_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,7 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
       },
       // {
       //   'icon': Icons.videocam,
-      //   'title': 'Visual Mode',
+      //   'title': 'Mënyra Vizuale',
       //   'onTap': () => Navigator.push(
       //     context,
       //     MaterialPageRoute(builder: (context) => const VisualModeScreen()),
@@ -41,174 +40,112 @@ class _ProfilePageState extends State<ProfilePage> {
       // },
       {
         'icon': Icons.logout,
-        'title': 'Logout',
+        'title': 'Dilni',
         'onTap': () async {
           HapticFeedback.lightImpact();
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return Theme.of(context).platform == TargetPlatform.iOS
-                  ? CupertinoAlertDialog(
-                      title: Text(
-                        'Confirm Logout',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(fontSize: 22),
-                      ),
-                      content: Text(
-                        'Do you really want to logout?',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(fontSize: 14),
-                      ),
-                      actions: [
-                        CupertinoDialogAction(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            'Cancel',
-                            style: GoogleFonts.nunito(
-                              color: CupertinoColors.systemBlue,
-                            ),
-                          ),
-                        ),
-                        CupertinoDialogAction(
-                          onPressed: () async {
-                            final SharedPreferences preferences =
-                                await SharedPreferences.getInstance();
-                            await preferences.remove('lastLoginTimestamp');
-                            await AuthService().signout(context: context);
-                          },
-                          isDestructiveAction: true,
-                          child: Text('Log Out', style: GoogleFonts.nunito()),
-                        ),
-                      ],
-                    )
-                  : AlertDialog(
-                      title: Text(
-                        'Confirm Logout',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(fontSize: 22),
-                      ),
-                      content: Text(
-                        'Do you really want to logout?',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(fontSize: 14),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            'Cancel',
-                            style: GoogleFonts.nunito(color: Colors.blue),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            final SharedPreferences preferences =
-                                await SharedPreferences.getInstance();
-                            await preferences.remove('lastLoginTimestamp');
-                            await AuthService().signout(context: context);
-                          },
-                          child: Text(
-                            'Log Out',
-                            style: GoogleFonts.nunito(color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    );
+              return AlertDialog(
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                title: Text(
+                  'Konfirmo Daljen',
+                  style: GoogleFonts.nunito(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+                content: Text(
+                  'A jeni të sigurt që dëshironi të dilni?',
+                  style: GoogleFonts.nunito(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Anulo',
+                      style: GoogleFonts.nunito(color: Colors.grey.shade600),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final SharedPreferences preferences =
+                          await SharedPreferences.getInstance();
+                      await preferences.remove('lastLoginTimestamp');
+                      await AuthService().signout(context: context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text('Dilni', style: GoogleFonts.nunito()),
+                  ),
+                ],
+              );
             },
           );
         },
       },
       {
         'icon': Icons.delete_forever,
-        'title': 'Delete Account',
+        'title': 'Fshi Llogarinë',
         'onTap': () async {
           HapticFeedback.lightImpact();
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return Theme.of(context).platform == TargetPlatform.iOS
-                  ? CupertinoAlertDialog(
-                      title: Text(
-                        'Confirm Account Deletion',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(fontSize: 22),
-                      ),
-                      content: Text(
-                        'Do you really want to delete your account? This action cannot be undone.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(fontSize: 14),
-                      ),
-                      actions: [
-                        CupertinoDialogAction(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            'Cancel',
-                            style: GoogleFonts.nunito(
-                              color: CupertinoColors.systemBlue,
-                            ),
-                          ),
-                        ),
-                        CupertinoDialogAction(
-                          onPressed: () async {
-                            final result = await AuthService().deleteUser(
-                              context,
-                            );
-                            if (result) {
-                              final SharedPreferences preferences =
-                                  await SharedPreferences.getInstance();
-                              await preferences.remove('lastLoginTimestamp');
-                            }
-                          },
-                          isDestructiveAction: true,
-                          child: Text('Delete', style: GoogleFonts.nunito()),
-                        ),
-                      ],
-                    )
-                  : AlertDialog(
-                      title: Text(
-                        'Confirm Account Deletion',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(fontSize: 22),
-                      ),
-                      content: Text(
-                        'Do you really want to delete your account? This action cannot be undone.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.nunito(fontSize: 14),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            'Cancel',
-                            style: GoogleFonts.nunito(color: Colors.blue),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            final result = await AuthService().deleteUser(
-                              context,
-                            );
-                            if (result) {
-                              final SharedPreferences preferences =
-                                  await SharedPreferences.getInstance();
-                              await preferences.remove('lastLoginTimestamp');
-                            }
-                          },
-                          child: Text(
-                            'Delete',
-                            style: GoogleFonts.nunito(color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    );
+              return AlertDialog(
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                title: Text(
+                  'Konfirmo Fshirjen e Llogarisë',
+                  style: GoogleFonts.nunito(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+                content: Text(
+                  'A jeni të sigurt që dëshironi të fshini llogarinë tuaj? Ky veprim nuk mund të kthehet mbrapsht.',
+                  style: GoogleFonts.nunito(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Anulo',
+                      style: GoogleFonts.nunito(color: Colors.grey.shade600),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final result = await AuthService().deleteUser(context);
+                      if (result) {
+                        final SharedPreferences preferences =
+                            await SharedPreferences.getInstance();
+                        await preferences.remove('lastLoginTimestamp');
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text('Fshi', style: GoogleFonts.nunito()),
+                  ),
+                ],
+              );
             },
           );
         },
